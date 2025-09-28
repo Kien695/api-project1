@@ -206,11 +206,8 @@ module.exports.logout = async (req, res) => {
 var imagesArr = [];
 module.exports.userAvatar = async (req, res) => {
   try {
-    imagesArr = [];
     const userId = res.locals.userId;
-
-    const img = req.files;
-    const user = await User.findOne({ _id: userId });
+    let user = await User.findById(userId);
     if (!user) {
       return res.status(400).json({
         error: true,
@@ -218,38 +215,20 @@ module.exports.userAvatar = async (req, res) => {
         message: "Người dùng không tồn tại",
       });
     }
-    //first remove image
-    const imgUrl = user.avatar;
-    const urlArr = imgUrl.split("/");
-    const avatarImage = urlArr[urlArr.length - 1];
-    const imageName = avatarImage.split(".")[0];
-    if (imageName) {
-      const results = await cloudinary.uploader.destroy(
-        imageName,
-        (error, result) => {}
-      );
+
+    // Xóa ảnh cũ nếu có
+    if (user.avatar_public_id) {
+      await cloudinary.uploader.destroy(user.avatar_public_id);
     }
 
-    const options = {
-      user_fileName: true,
-      unique_fileName: false,
-      overwrite: false,
-    };
-    for (let i = 0; i < img?.length; i++) {
-      const img = await cloudinary.uploader.upload(
-        req.files[i].path,
-        options,
-        function (error, result) {
-          imagesArr.push(result.secure_url);
-          fs.unlinkSync(`uploads/${req.files[i].filename}`);
-        }
-      );
-    }
-    user.avatar = imagesArr[0];
+    // Cập nhật avatar mới
+    user.avatar = req.body.avatar;
+    user.avatar_public_id = req.body.avatar_public_id;
     await user.save();
+
     return res.status(200).json({
-      _id: userId,
-      avatar: imagesArr[0],
+      _id: user._id,
+      avatar: user.avatar,
     });
   } catch (error) {
     return res.status(500).json({
@@ -283,49 +262,55 @@ module.exports.removeImage = async (req, res) => {
 module.exports.updateUser = async (req, res) => {
   try {
     const userId = req.params.id;
-    const { name, email, mobile, password } = req.body;
-    const exitUser = await User.findById(userId);
-    if (!exitUser) {
+    let { name, email, mobile, password } = req.body; // dùng let để có thể gán lại
+
+    // Tìm user hiện tại
+    const existUser = await User.findById(userId);
+    if (!existUser) {
       return res.status(400).send("Tài khoản không được cập nhật");
     }
+
     let verifyCode = "";
-    if (email !== exitUser.email) {
-      verifyCode = Math.floor(100000 * Math.random() * 900000).toString();
+    let otpExpires = null;
+    let emailToUse = email || existUser.email;
+
+    // Nếu email thay đổi, tạo OTP và gửi email
+    if (email && email !== existUser.email) {
+      verifyCode = Math.floor(100000 + Math.random() * 900000).toString(); // 6 chữ số
+      otpExpires = Date.now() + 600000; // 10 phút
+      const subject = "Mã OTP xác minh";
+      const html = `Mã OTP lấy lại mật khẩu là: <b style="color: green;">${verifyCode}</b>. Thời hạn sử dụng là: ${otpExpires}`;
+      await sendMail(email, subject, html);
+      emailToUse = email; // sử dụng email mới
     }
-    let hashPassword = "";
+
+    // Hash password nếu có
+    let hashPassword = existUser.password;
     if (password) {
       const salt = await bcryptjs.genSalt(10);
       hashPassword = await bcryptjs.hash(password, salt);
-    } else {
-      hashPassword = exitUser.password;
     }
-    const updateUser = await User.findByIdAndUpdate(
+
+    // Cập nhật user
+    const updatedUser = await User.findByIdAndUpdate(
       userId,
       {
-        name: name,
-        mobile: mobile,
-        email: email,
-        verify_email: email !== exitUser.email ? false : true,
+        name: name || existUser.name,
+        mobile: mobile || existUser.mobile,
+        email: emailToUse,
+        verify_email: emailToUse !== existUser.email ? false : true,
         password: hashPassword,
         otp: verifyCode !== "" ? verifyCode : null,
-        otpExpires: verifyCode !== "" ? Date.now() + 600000 : "",
+        otpExpires: otpExpires,
       },
-      {
-        new: true,
-      }
+      { new: true }
     );
-
-    if (email !== exitUser.email) {
-      const subject = "Mã OTP xác minh";
-      const html = `Mã OTP lấy lại mật khẩu là: <b style="color: green;">${verifyCode}</b>. Thời hạn sử dụng là: ${updateUser.otpExpires}`;
-      const verifyEmail = await sendMail(email, subject, html);
-    }
 
     return res.status(200).json({
       message: "Cập nhật tài khoản thành công",
       error: false,
       success: true,
-      user: updateUser,
+      user: updatedUser,
     });
   } catch (error) {
     return res.status(500).json({
@@ -335,6 +320,7 @@ module.exports.updateUser = async (req, res) => {
     });
   }
 };
+
 //forgotPassword
 module.exports.forgotPassword = async (req, res) => {
   try {

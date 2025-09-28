@@ -18,6 +18,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    avatar_public_id: { type: String, default: "" },
     mobile: {
       type: String,
       default: null,

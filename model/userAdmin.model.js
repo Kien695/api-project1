@@ -17,9 +17,26 @@ const AdminUserSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    avatar_public_id: { type: String, default: "" },
     mobile: {
       type: String,
       default: null,
+    },
+    dateOfBirth: {
+      type: Date,
+      default: null,
+    },
+    province: {
+      type: String,
+      default: "",
+    },
+    district: {
+      type: String,
+      default: "",
+    },
+    ward: {
+      type: String,
+      default: "",
     },
     verify_email: {
       type: Boolean,
@@ -55,6 +72,11 @@ const AdminUserSchema = new mongoose.Schema(
     deleted: {
       type: Boolean,
       default: false,
+    },
+    status: {
+      type: String,
+      enum: ["Active", "Inactive", "prohibited"],
+      default: "Active",
     },
     approved: { type: Boolean, default: false },
     role_id: String,

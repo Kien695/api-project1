@@ -1,5 +1,5 @@
-const { error } = require("console");
 const Category = require("../model/category.model");
+const categoryTree = require("../Helper/categoryTree");
 const cloudinary = require("cloudinary").v2;
 const fs = require("fs");
 cloudinary.config({
@@ -13,13 +13,14 @@ module.exports.createCategory = async (req, res) => {
   try {
     let category = new Category({
       name: req.body.name,
-      images: req.body.images,
+      images: req.body.avatar,
+      images_public_id: req.body.avatar_public_id,
       parentId: req.body.parentId,
       parentCatName: req.body.parentCatName,
     });
     if (!category) {
-      return res.status(500).json({
-        message: "Category không tạo được",
+      return res.status(400).json({
+        message: "Danh mục không tạo được",
         error: true,
         success: false,
       });
@@ -40,30 +41,46 @@ module.exports.createCategory = async (req, res) => {
   }
 };
 //get category
+// module.exports.getCategory = async (req, res) => {
+//   try {
+//     const categories = await Category.find();
+//     const categoryMap = {};
+//     categories.forEach((category) => {
+//       categoryMap[category._id] = { ...category._doc, children: [] };
+//     });
+//     const rootCategories = [];
+//     categories.forEach((category) => {
+//       if (category.parentId) {
+//         categoryMap[category.parentId].children.push(categoryMap[category._id]);
+//       } else {
+//         rootCategories.push(categoryMap[category._id]);
+//       }
+//     });
+//     return res.status(200).json({
+//       error: false,
+//       success: true,
+//       data: rootCategories,
+//     });
+//   } catch (error) {
+//     return res.status(500).json({
+//       message: error.message || error,
+//       error: true,
+//       success: false,
+//     });
+//   }
+// };
 module.exports.getCategory = async (req, res) => {
   try {
-    const categories = await Category.find();
-    const categoryMap = {};
-    categories.forEach((category) => {
-      categoryMap[category._id] = { ...category._doc, children: [] };
-    });
-    const rootCategories = [];
-    categories.forEach((category) => {
-      if (category.parentId) {
-        categoryMap[category.parentId].children.push(categoryMap[category._id]);
-      } else {
-        rootCategories.push(categoryMap[category._id]);
-      }
-    });
+    const categories = await Category.find().lean();
+    const tree = categoryTree(categories);
     return res.status(200).json({
-      message: "Tạo danh mục thành công",
       error: false,
       success: true,
-      data: rootCategories,
+      data: tree,
     });
   } catch (error) {
-    return res.status(500).json({
-      message: error.message || error,
+    res.status(500).json({
+      message: error.message || "Lỗi server",
       error: true,
       success: false,
     });
@@ -162,16 +179,7 @@ module.exports.removeImage = async (req, res) => {
 module.exports.deleteCategory = async (req, res) => {
   try {
     const category = await Category.findById(req.params.id);
-    const images = category.images;
-    for (let img of images) {
-      const imgUrl = img;
-      const UrlArr = imgUrl.split("/");
-      const image = UrlArr[UrlArr.length - 1];
-      const imageName = image.split(".")[0];
-      if (imageName) {
-        cloudinary.uploader.destroy(imageName, (error, result) => {});
-      }
-    }
+
     const subCategory = await Category.find({
       parentId: req.params.id,
     });
@@ -185,6 +193,9 @@ module.exports.deleteCategory = async (req, res) => {
         );
       }
       const deleteSubCat = await Category.findByIdAndDelete(subCategory[i]._id);
+    }
+    if (category.avatar_public_id) {
+      await cloudinary.uploader.destroy(category.avatar_public_id);
     }
     const deleteCat = await Category.findByIdAndDelete(req.params.id);
     if (!deleteCat) {
@@ -210,18 +221,30 @@ module.exports.deleteCategory = async (req, res) => {
 //updateCategory
 module.exports.updateCategory = async (req, res) => {
   try {
+    const oldCategory = await Category.findById(req.params.id);
+    if (!oldCategory) {
+      return res.status(404).json({
+        message: "Danh mục không tồn tại",
+        error: true,
+        success: false,
+      });
+    }
+    const updateData = {};
+    if (req.body.name) updateData.name = req.body.name;
+    if (req.body.avatar) updateData.images = req.body.avatar;
+    if (req.body.avatar_public_id)
+      updateData.images_public_id = req.body.avatar_public_id;
+    if (req.body.parentId) updateData.parentId = req.body.parentId;
+    if (req.body.parentCatName)
+      updateData.parentCatName = req.body.parentCatName;
     const category = await Category.findByIdAndUpdate(
       req.params.id,
-      {
-        name: req.body.name,
-        images: req.body.images,
-        parentId: req.body.parentId,
-        parentCatName: req.body.parentCatName,
-      },
+      updateData,
       {
         new: true,
       }
     );
+
     if (!category) {
       res.status(400).json({
         message: "Cập nhật danh mục thất bại",
@@ -229,7 +252,12 @@ module.exports.updateCategory = async (req, res) => {
         error: true,
       });
     }
+    // Xóa ảnh cũ nếu có
+    if (req.body.avatar_public_id && oldCategory.images_public_id) {
+      await cloudinary.uploader.destroy(oldCategory.images_public_id);
+    }
     res.status(200).json({
+      message: "Cập nhật danh mục thành công",
       error: false,
       success: true,
       category: category,

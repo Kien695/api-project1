@@ -6,11 +6,11 @@ const categorySchema = new mongoose.Schema(
       trim: true,
       required: true,
     },
-    images: [
-      {
-        type: String,
-      },
-    ],
+    images: {
+      type: String,
+      default: "",
+    },
+    images_public_id: { type: String, default: "" },
     parentCatName: {
       default: null,
       type: String,

@@ -8,12 +8,12 @@ const upload = multer();
 router.get("/", controller.getCategory);
 router.post(
   "/create",
-  upload.array("images", 5),
-  uploadCloud.upload,
+  upload.single("images"),
+  uploadCloud.uploadOne,
 
   controller.createCategory
 );
-router.get("/get/count", middleware.auth, controller.getCategoryCount);
+router.get("/get/count", controller.getCategoryCount);
 router.get(
   "/get/count/subCat",
 
@@ -24,8 +24,8 @@ router.delete("/deleteImage", middleware.auth, controller.removeImage);
 router.delete("/delete/:id", middleware.auth, controller.deleteCategory);
 router.put(
   "/update/:id",
-  upload.array("images", 5),
-  uploadCloud.upload,
+  upload.single("images"),
+  uploadCloud.uploadOne,
   middleware.auth,
 
   controller.updateCategory

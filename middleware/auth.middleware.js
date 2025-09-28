@@ -3,9 +3,9 @@ module.exports.auth = async (req, res, next) => {
   try {
     var token =
       req.cookies.accessToken || req?.headers?.authorization?.split(" ")[1];
+
     if (!token) {
       token = req.query.token;
-      console.log(token);
     }
 
     const decode = await jwt.verify(token, process.env.SECRET_KEY_ACCESS_TOKEN);
