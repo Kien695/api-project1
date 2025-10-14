@@ -5,6 +5,7 @@ const controller = require("../controller/product.controller");
 const middleware = require("../middleware/auth.middleware");
 const upload = multer();
 const uploadToCloud = require("../middleware/uploadCloud.midleware");
+
 router.get("/", controller.getProduct);
 router.get("/getProductByCategory/:id", controller.getProductByCategoryId);
 router.get("/getProductByCategory/", controller.getProductByCategoryName);
@@ -33,7 +34,7 @@ router.post(
   uploadToCloud.upload,
   controller.createProduct
 );
-router.put(
+router.patch(
   "/update/:id",
   upload.array("images", 5),
   uploadToCloud.upload,

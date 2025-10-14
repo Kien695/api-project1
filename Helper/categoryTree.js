@@ -5,6 +5,7 @@ const categoryTree = (categories, parentId = null) => {
       _id: cat._id,
       name: cat.name,
       images: cat.images,
+      parentCatName: cat.parentCatName,
       children: categoryTree(categories, cat._id),
     }));
 };

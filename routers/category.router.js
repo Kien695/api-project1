@@ -20,7 +20,7 @@ router.get(
   controller.subGetCategoryCount
 );
 router.get("/:id", controller.getSingleCategory);
-router.delete("/deleteImage", middleware.auth, controller.removeImage);
+
 router.delete("/delete/:id", middleware.auth, controller.deleteCategory);
 router.put(
   "/update/:id",
@@ -29,5 +29,11 @@ router.put(
   middleware.auth,
 
   controller.updateCategory
+);
+router.put(
+  "/updateSub/:id",
+  middleware.auth,
+
+  controller.updateSubCategory
 );
 module.exports = router;

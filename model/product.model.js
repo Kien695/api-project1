@@ -12,8 +12,8 @@ const productSchema = new mongoose.Schema(
     },
     images: [
       {
-        type: String,
-        required: true,
+        url: { type: String, required: true }, // URL ảnh
+        public_id: { type: String, required: true }, // public_id để xóa ảnh
       },
     ],
     brand: {
@@ -28,30 +28,7 @@ const productSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    catName: {
-      type: String,
-      default: "",
-    },
-    catId: {
-      type: String,
-      default: "",
-    },
-    subCatId: {
-      type: String,
-      default: "",
-    },
-    subCat: {
-      type: String,
-      default: "",
-    },
-    thirdSubCat: {
-      type: String,
-      default: "",
-    },
-    thirdSubCatId: {
-      type: String,
-      default: "",
-    },
+
     category: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
@@ -83,10 +60,6 @@ const productSchema = new mongoose.Schema(
     dateCreated: {
       type: Date,
       default: Date.now,
-    },
-    password: {
-      type: String,
-      required: [true, "Vui lòng nhập password"],
     },
   },
   {

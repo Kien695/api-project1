@@ -1,9 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const controller = require("../controller/dashboard.controller");
+router.get("/", controller.dashboard);
 
-router.get("/", (req, res) => {
-  res.json({
-    message: "Server is running",
-  });
-});
 module.exports = router;

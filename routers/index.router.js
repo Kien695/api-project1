@@ -1,16 +1,22 @@
 const homeRouter = require("./home.router");
-const registerRouter = require("./register.router");
+const clientRouter = require("./userClient.router");
 const categoryRouter = require("./category.router");
 const productRouter = require("./product.router");
 const cartRouter = require("./cart.router");
 const myListRouter = require("./myList.router");
 const adminUser = require("./userAdmin.router");
+const bannerHome = require("./bannerHome.router");
+const blogRouter = require("./blog.router");
+const logoRouter = require("./logo.router");
 module.exports = (app) => {
-  app.use("/", homeRouter);
-  app.use("/api/user", registerRouter);
+  app.use("/api/dashboard", homeRouter);
+  app.use("/api/user", clientRouter);
   app.use("/api/category", categoryRouter);
   app.use("/api/product", productRouter);
   app.use("/api/cart", cartRouter);
   app.use("/api/myList", myListRouter);
   app.use("/api/userAdmin", adminUser);
+  app.use("/api/banner", bannerHome);
+  app.use("/api/blog", blogRouter);
+  app.use("/api/logo", logoRouter);
 };

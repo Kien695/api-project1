@@ -11,35 +11,49 @@ cloudinary.config({
 
 //upload nhiều
 module.exports.upload = async (req, res, next) => {
-  const streamUpload = (file) => {
-    return new Promise((resolve, reject) => {
-      const stream = cloudinary.uploader.upload_stream(
-        { folder: "category-images" }, // Tùy bạn đổi tên folder
-        (error, result) => {
-          if (result) {
-            resolve(result.secure_url);
-          } else {
-            reject(error);
-          }
-        }
-      );
-      streamifier.createReadStream(file.buffer).pipe(stream);
-    });
-  };
-
   try {
-    const uploadPromises = req.files.map((file) => streamUpload(file));
-    const imageUrls = await Promise.all(uploadPromises);
+    let newImages = [];
+    if (req.files && req.files.length > 0) {
+      const uploadPromises = req.files.map(
+        (file) =>
+          new Promise((resolve, reject) => {
+            const stream = cloudinary.uploader.upload_stream(
+              { folder: "category-images" },
+              (error, result) => {
+                if (result) {
+                  resolve({
+                    url: result.secure_url,
+                    public_id: result.public_id,
+                  });
+                } else reject(error);
+              }
+            );
+            streamifier.createReadStream(file.buffer).pipe(stream);
+          })
+      );
+      newImages = await Promise.all(uploadPromises);
+    }
 
-    // Gán vào req.body hoặc req.images để sử dụng tiếp
-    req.body.images = imageUrls;
+    // Parse oldImages (nếu có)
+    let oldImages = [];
+    if (req.body.oldImages) {
+      try {
+        oldImages = JSON.parse(req.body.oldImages);
+      } catch (e) {
+        oldImages = [];
+      }
+    }
 
-    next(); // ⬅ Quan trọng để đi tiếp!
-  } catch (error) {
-    console.error("Upload error:", error);
-    res.status(500).json({ message: "Upload failed", error });
+    // Merge ảnh cũ + ảnh mới
+    req.body.images = [...oldImages, ...newImages];
+
+    next();
+  } catch (err) {
+    console.error("Upload error:", err);
+    res.status(500).json({ message: "Upload failed", error: err });
   }
 };
+
 //upload 1
 module.exports.uploadOne = async (req, res, next) => {
   if (!req.file) {
@@ -61,7 +75,7 @@ module.exports.uploadOne = async (req, res, next) => {
 
   try {
     const result = await streamUpload(req);
-    console.log(result);
+
     req.body.avatar = result.secure_url; // chỉ lấy link ảnh
     req.body.avatar_public_id = result.public_id; // lưu public_id để tiện xóa
     next();

@@ -13,6 +13,42 @@ cloudinary.config({
   api_secret: process.env.CLOUD_SECRET,
   secure: true,
 });
+//list user
+module.exports.getUser = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const perPage = parseInt(req.query.perPage) || 6;
+
+    const userList = await User.find()
+      .skip((page - 1) * perPage)
+      .limit(perPage);
+    const totalUser = await User.countDocuments();
+    const totalPage = Math.ceil(totalUser / perPage);
+    if (!userList) {
+      return res.status(400).json({
+        message: "Không có khách hàng nào!",
+        error: false,
+        success: true,
+      });
+    }
+    return res.status(200).json({
+      error: false,
+      success: true,
+      data: userList,
+      page: page,
+      totalItem: totalUser,
+      totalPage: totalPage,
+      perPage: perPage,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message || error,
+      error: true,
+      success: false,
+    });
+  }
+};
+//register
 module.exports.register = async (req, res) => {
   try {
     let user;

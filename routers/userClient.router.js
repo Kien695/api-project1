@@ -6,6 +6,7 @@ const controller = require("../controller/user.controller");
 const multer = require("multer");
 const upload = multer();
 const uploadToCloud = require("../middleware/uploadCloud.midleware");
+router.get("/", controller.getUser);
 router.post("/register", controller.register);
 router.post("/verifyEmail", controller.verifyEmail);
 router.post("/login", controller.login);

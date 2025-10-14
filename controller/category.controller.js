@@ -40,35 +40,7 @@ module.exports.createCategory = async (req, res) => {
     });
   }
 };
-//get category
-// module.exports.getCategory = async (req, res) => {
-//   try {
-//     const categories = await Category.find();
-//     const categoryMap = {};
-//     categories.forEach((category) => {
-//       categoryMap[category._id] = { ...category._doc, children: [] };
-//     });
-//     const rootCategories = [];
-//     categories.forEach((category) => {
-//       if (category.parentId) {
-//         categoryMap[category.parentId].children.push(categoryMap[category._id]);
-//       } else {
-//         rootCategories.push(categoryMap[category._id]);
-//       }
-//     });
-//     return res.status(200).json({
-//       error: false,
-//       success: true,
-//       data: rootCategories,
-//     });
-//   } catch (error) {
-//     return res.status(500).json({
-//       message: error.message || error,
-//       error: true,
-//       success: false,
-//     });
-//   }
-// };
+//getCategory
 module.exports.getCategory = async (req, res) => {
   try {
     const categories = await Category.find().lean();
@@ -156,56 +128,32 @@ module.exports.getSingleCategory = async (req, res) => {
     });
   }
 };
-//removeImageFromCloudinary
-var imagesArr = [];
-module.exports.removeImage = async (req, res) => {
-  const imgUrl = req.query.img;
-  const urlArr = imgUrl.split("/");
-  //https://res.cloudinary.com/dzyi6hnfr/image/upload/v1754130369/vltgswbyxwgx4u5suvdd.png
-  // image = ["https","res.cloudinary.com","image","upload","v1754130369","vltgswbyxwgx4u5suvdd.png"];
-  const image = urlArr[urlArr.length - 1];
-  const imageName = image.split(".")[0];
-  if (imageName) {
-    const results = await cloudinary.uploader.destroy(
-      imageName,
-      (error, result) => {}
-    );
-    if (res) {
-      return res.status(200).send(results);
-    }
-  }
-};
+
 //delete category
 module.exports.deleteCategory = async (req, res) => {
   try {
-    const category = await Category.findById(req.params.id);
-
-    const subCategory = await Category.find({
-      parentId: req.params.id,
-    });
-    for (let i = 0; i < subCategory.length; i++) {
-      const thirdCategory = await Category.find({
-        parentId: subCategory[i]._id,
+    const hasChildren = await Category.findOne({ parentId: req.params.id });
+    if (hasChildren) {
+      return res.status(400).json({
+        error: true,
+        success: false,
+        message: "Không thể xóa danh mục này vì tồn tại danh mục con!",
       });
-      for (let i = 0; i < thirdCategory.length; i++) {
-        const deleteThirdCategory = await Category.findByIdAndDelete(
-          thirdCategory[i]._id
-        );
-      }
-      const deleteSubCat = await Category.findByIdAndDelete(subCategory[i]._id);
     }
-    if (category.avatar_public_id) {
-      await cloudinary.uploader.destroy(category.avatar_public_id);
-    }
+
     const deleteCat = await Category.findByIdAndDelete(req.params.id);
+
     if (!deleteCat) {
-      res.status(404).json({
+      return res.status(404).json({
         error: true,
         success: false,
         message: "Danh mục không được tìm thấy",
       });
     }
-    res.status(200).json({
+    if (deleteCat.avatar_public_id) {
+      await cloudinary.uploader.destroy(deleteCat.avatar_public_id);
+    }
+    return res.status(200).json({
       success: true,
       error: false,
       message: "Danh mục đã được xóa",
@@ -254,13 +202,42 @@ module.exports.updateCategory = async (req, res) => {
     }
     // Xóa ảnh cũ nếu có
     if (req.body.avatar_public_id && oldCategory.images_public_id) {
-      await cloudinary.uploader.destroy(oldCategory.images_public_id);
+      cloudinary.uploader.destroy(oldCategory.images_public_id);
     }
     res.status(200).json({
       message: "Cập nhật danh mục thành công",
       error: false,
       success: true,
       category: category,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message || error,
+      error: true,
+      success: false,
+    });
+  }
+};
+//updateSubCategory
+module.exports.updateSubCategory = async (req, res) => {
+  try {
+    const { name, parentId } = req.body;
+    const id = req.params.id;
+    const category = await Category.findById(id);
+    if (!category) {
+      return res.status(400).json({
+        message: "Danh mục cha không hợp lệ",
+        error: true,
+        success: false,
+      });
+    }
+    category.name = name || category.name;
+    category.parentId = parentId || null;
+    await category.save();
+    return res.status(200).json({
+      message: "Cập nhật danh mục con thành công",
+      error: false,
+      success: true,
     });
   } catch (error) {
     return res.status(500).json({
