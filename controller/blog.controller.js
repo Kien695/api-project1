@@ -76,6 +76,7 @@ module.exports.deleteBlog = async (req, res) => {
     });
   }
 };
+//edit
 module.exports.editBlog = async (req, res) => {
   try {
     const oldBlog = await Blog.findById(req.params.id);

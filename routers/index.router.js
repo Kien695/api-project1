@@ -8,6 +8,7 @@ const adminUser = require("./userAdmin.router");
 const bannerHome = require("./bannerHome.router");
 const blogRouter = require("./blog.router");
 const logoRouter = require("./logo.router");
+const roleRouter = require("./role.router");
 module.exports = (app) => {
   app.use("/api/dashboard", homeRouter);
   app.use("/api/user", clientRouter);
@@ -19,4 +20,5 @@ module.exports = (app) => {
   app.use("/api/banner", bannerHome);
   app.use("/api/blog", blogRouter);
   app.use("/api/logo", logoRouter);
+  app.use("/api/role", roleRouter);
 };
