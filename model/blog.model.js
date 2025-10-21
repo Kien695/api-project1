@@ -17,6 +17,10 @@ const blogSchema = new mongoose.Schema(
       type: String,
       require: [true, "Vui lòng nhập mô tả!"],
     },
+    deleted: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,

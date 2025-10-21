@@ -1,4 +1,5 @@
 const Role = require("../model/role.model");
+console.log("🟢 Controller file loaded from:", __filename);
 //get
 module.exports.getRole = async (req, res) => {
   try {
@@ -59,6 +60,26 @@ module.exports.delete = async (req, res) => {
     const role = await Role.findByIdAndDelete(req.params.id);
     return res.status(200).json({
       message: "Xóa nhóm quyền thành công!",
+      error: false,
+      success: true,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message || error,
+      error: true,
+      success: false,
+    });
+  }
+};
+//permissions
+module.exports.permission = async (req, res) => {
+  try {
+    const permissions = req.body;
+    for (const item of permissions) {
+      await Role.updateOne({ _id: item.id }, { permissions: item.permissions });
+    }
+    return res.status(200).json({
+      message: "Cập nhật phân quyền thành công!",
       error: false,
       success: true,
     });

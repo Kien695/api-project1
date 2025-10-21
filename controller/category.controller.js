@@ -58,52 +58,7 @@ module.exports.getCategory = async (req, res) => {
     });
   }
 };
-//get category count
-module.exports.getCategoryCount = async (req, res) => {
-  try {
-    const countCategories = await Category.countDocuments({
-      parentId: null,
-    });
-    if (!countCategories) {
-      res.status(500).json({ success: false, error: true });
-    } else {
-      res.send({
-        countCategories: countCategories,
-      });
-    }
-  } catch (error) {
-    return res.status(500).json({
-      message: error.message || error,
-      error: true,
-      success: false,
-    });
-  }
-};
-//get sub category count
-module.exports.subGetCategoryCount = async (req, res) => {
-  try {
-    const Categories = await Category.find();
-    if (!Categories) {
-      res.status(500).json({ success: false, error: true });
-    } else {
-      let subCatList = [];
-      for (let cat of Categories) {
-        if (cat.parentId !== null) {
-          subCatList.push(cat);
-        }
-      }
-      res.send({
-        subCountCategories: subCatList.length,
-      });
-    }
-  } catch (error) {
-    return res.status(500).json({
-      message: error.message || error,
-      error: true,
-      success: false,
-    });
-  }
-};
+
 //get single category
 module.exports.getSingleCategory = async (req, res) => {
   try {

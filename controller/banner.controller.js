@@ -70,9 +70,14 @@ module.exports.edit = async (req, res) => {
         success: false,
       });
     }
+    const updateData = {};
+
+    if (req.body.avatar) updateData.images = req.body.avatar;
+    if (req.body.avatar_public_id)
+      updateData.images_public_id = req.body.avatar_public_id;
     const updated = await BannerHome.findByIdAndUpdate(
       req.params.id,
-      req.body,
+      updateData,
       { new: true }
     );
     if (req.body.avatar_public_id && oldBanner.images_public_id) {
@@ -112,6 +117,41 @@ module.exports.delete = async (req, res) => {
       error: false,
       success: true,
     });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message || error,
+      error: true,
+      success: false,
+    });
+  }
+};
+//deleteALL
+module.exports.deleteAll = async (req, res) => {
+  try {
+    const ids = req.body.ids;
+    if (!ids || !ids.length)
+      return res
+        .status(400)
+        .json({ success: false, message: "Không có ID nào được gửi." });
+
+    // Lấy tất cả banner cần xóa
+    const banners = await BannerHome.find({ _id: { $in: ids } });
+
+    // Lấy danh sách public_id
+    const publicIds = banners.map((b) => b.images_public_id).filter(Boolean); // bỏ những cái null/undefined
+
+    // Xóa song song trên Cloudinary
+    await Promise.all(
+      publicIds.map((pid) =>
+        cloudinary.uploader
+          .destroy(pid)
+          .catch((err) => console.error("Cloudinary delete error:", err))
+      )
+    );
+
+    // Sau khi xóa ảnh thì xóa trong DB
+    await BannerHome.deleteMany({ _id: { $in: ids } });
+    res.json({ success: true, message: "Xóa banner thành công!" });
   } catch (error) {
     return res.status(500).json({
       message: error.message || error,

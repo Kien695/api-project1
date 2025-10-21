@@ -46,12 +46,10 @@ const productSchema = new mongoose.Schema(
       default: false,
     },
 
-    size: [
-      {
-        type: String,
-        default: null,
-      },
-    ],
+    size: {
+      type: [String],
+      default: null,
+    },
 
     deleted: {
       type: Boolean,
@@ -60,6 +58,10 @@ const productSchema = new mongoose.Schema(
     dateCreated: {
       type: Date,
       default: Date.now,
+    },
+    deletedBy: {
+      account_id: { type: mongoose.Schema.Types.ObjectId, ref: "AdminUser" },
+      deletedAt: Date,
     },
   },
   {

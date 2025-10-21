@@ -7,26 +7,11 @@ const upload = multer();
 const uploadToCloud = require("../middleware/uploadCloud.midleware");
 
 router.get("/", controller.getProduct);
-router.get("/getProductByCategory/:id", controller.getProductByCategoryId);
-router.get("/getProductByCategory/", controller.getProductByCategoryName);
-router.get("/getProductBySubCategory/", controller.getProductBySubCategoryName);
-router.get(
-  "/getProductBySubCategory/:id",
-  controller.getProductBySubCategoryId
-);
-router.get(
-  "/getProductByThirdSubCategory/",
-  controller.getProductByThirdSubCategoryName
-);
-router.get(
-  "/getProductByThirdSubCategory/:id",
-  controller.getProductByThirdSubCategoryId
-);
-router.get("/getProductByPrice", controller.getProductByPrice);
-router.get("/getProductByRating", controller.getProductByRating);
-router.get("/getProductCount", controller.productCount);
-router.get("/getProductFeatured", controller.getProductByFeatured);
-router.delete("/deleteProduct/:id", controller.deleteProduct);
+router.get("/trash", controller.getTrash);
+
+router.patch("/deleteProduct/:id", middleware.auth, controller.deleteProduct);
+router.delete("/trashDelete/:id", controller.deleteProductTrash);
+router.patch("/restore/:id", controller.restoreProduct);
 router.get("/:id", controller.getSingleProduct);
 router.post(
   "/create",
@@ -41,5 +26,12 @@ router.patch(
   middleware.auth,
 
   controller.updateProduct
+);
+router.patch(
+  "/change-multi",
+
+  middleware.auth,
+
+  controller.changeMulti
 );
 module.exports = router;

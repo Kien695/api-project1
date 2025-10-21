@@ -285,9 +285,9 @@ module.exports.userDetail = async (req, res) => {
   try {
     const userId = res.locals.userId;
 
-    const user = await UserAdmin.findById(userId).select(
-      "-password -refresh_token"
-    );
+    const user = await UserAdmin.findById(userId)
+      .select("-password -refresh_token")
+      .populate("role");
     return res.status(200).json({
       message: "Chi tiết người dùng",
       error: false,
@@ -321,6 +321,137 @@ module.exports.logout = async (req, res) => {
       error: false,
       success: true,
       message: "Đăng xuất thành công",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      error: true,
+      success: false,
+      message: error.message || error,
+    });
+  }
+};
+//[get] // get account
+module.exports.getAccount = async (req, res) => {
+  try {
+    const account = await UserAdmin.find({ deleted: false, approved: true })
+      .select("-password -access-token -otp -refresh-token")
+      .populate("role");
+    if (!account) {
+      return res.json({
+        error: true,
+        success: false,
+      });
+    }
+    return res.status(200).json({
+      error: false,
+      success: true,
+      data: account,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      error: true,
+      success: false,
+      message: error.message || error,
+    });
+  }
+};
+//[get] // get account not approved
+module.exports.getNotApproved = async (req, res) => {
+  try {
+    const account = await UserAdmin.find({
+      deleted: false,
+      approved: false,
+    }).select("-password -access-token -otp -refresh-token");
+    if (!account) {
+      return res.json({
+        error: true,
+        success: false,
+      });
+    }
+    return res.status(200).json({
+      error: false,
+      success: true,
+      data: account,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      error: true,
+      success: false,
+      message: error.message || error,
+    });
+  }
+};
+//[post] //update approved
+module.exports.updateApproved = async (req, res) => {
+  try {
+    const update = await UserAdmin.findByIdAndUpdate(
+      req.params.id,
+      { approved: true },
+      { new: true }
+    );
+    return res.status(200).json({
+      error: false,
+      success: true,
+      message: "Đã phê duyệt thành công",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      error: true,
+      success: false,
+      message: error.message || error,
+    });
+  }
+};
+//[patch] //update role user
+module.exports.updateRoleUser = async (req, res) => {
+  try {
+    const update = await UserAdmin.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+    });
+    return res.status(200).json({
+      error: false,
+      success: true,
+      message: "Cập nhật quyền thành công thành công",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      error: true,
+      success: false,
+      message: error.message || error,
+    });
+  }
+};
+//[delete] /delete Account
+module.exports.deleteAccount = async (req, res) => {
+  try {
+    // Tìm đúng tài khoản theo id
+    const account = await UserAdmin.findById(req.params.id);
+
+    // Nếu không tìm thấy
+    if (!account) {
+      return res.status(404).json({
+        error: true,
+        success: false,
+        message: "Không tìm thấy tài khoản",
+      });
+    }
+
+    // Kiểm tra approved
+    if (!account.approved) {
+      return res.status(403).json({
+        error: true,
+        success: false,
+        message: "Không thể xóa tài khoản chưa được duyệt",
+      });
+    }
+
+    // Nếu hợp lệ thì xóa
+    await UserAdmin.findByIdAndDelete(req.params.id);
+
+    return res.status(200).json({
+      error: false,
+      success: true,
+      message: "Xóa tài khoản thành công",
     });
   } catch (error) {
     return res.status(500).json({

@@ -21,4 +21,11 @@ router.patch(
   controller.editBlog
 );
 router.delete("/deleteBlog/:id", controller.deleteBlog);
+router.patch(
+  "/change-multi",
+
+  middleware.auth,
+
+  controller.changeMulti
+);
 module.exports = router;

@@ -25,4 +25,5 @@ router.post("/verify-password", controller.verifyForgotPassword);
 router.post("/reset-password", controller.resetPassword);
 router.post("/refresh-token", controller.refreshToken);
 router.get("/user-detail", middleware.auth, controller.userDetail);
+router.delete("/deleteUser/:id", controller.deleteUser);
 module.exports = router;

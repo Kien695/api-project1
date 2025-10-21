@@ -10,7 +10,7 @@ cloudinary.config({
 //get
 module.exports.getBlog = async (req, res) => {
   try {
-    const blog = await Blog.find();
+    const blog = await Blog.find({ deleted: false });
     return res.status(200).json({
       data: blog,
       error: false,
@@ -106,6 +106,28 @@ module.exports.editBlog = async (req, res) => {
       error: false,
       success: true,
       data: updated,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message || error,
+      error: true,
+      success: false,
+    });
+  }
+};
+//change-multi
+module.exports.changeMulti = async (req, res) => {
+  try {
+    const type = req.body.type;
+    const ids = req.body.ids;
+    if (type === "delete-all" && Array.isArray(ids) && ids.length > 0) {
+      await Blog.updateMany({ _id: { $in: ids } }, { deleted: true });
+      return res.json({ success: true, message: "Xóa blog thành công!" });
+    }
+
+    return res.status(400).json({
+      success: false,
+      message: "Yêu cầu không hợp lệ!",
     });
   } catch (error) {
     return res.status(500).json({

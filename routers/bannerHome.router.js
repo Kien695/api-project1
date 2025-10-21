@@ -21,4 +21,5 @@ router.put(
   controller.edit
 );
 router.delete("/delete/:id", controller.delete);
+router.post("/delete-all", controller.deleteAll);
 module.exports = router;

@@ -79,7 +79,10 @@ const AdminUserSchema = new mongoose.Schema(
       default: "Active",
     },
     approved: { type: Boolean, default: false },
-    role_id: String,
+    role: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Role",
+    },
     deletedAt: Date,
   },
   {

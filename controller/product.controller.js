@@ -1,4 +1,5 @@
 const Product = require("../model/product.model");
+const UserAdmin = require("../model/userAdmin.model");
 const Category = require("../model/category.model");
 const searchHelper = require("../Helper/Search");
 const categoryHelper = require("../Helper/categoryAllFIlter");
@@ -78,13 +79,6 @@ module.exports.getProduct = async (req, res) => {
     const totalProduct = await Product.countDocuments(find);
     const totalPage = Math.ceil(totalProduct / perPage);
 
-    if (!product || product.length === 0) {
-      res.status(400).json({
-        message: "Sản phẩm không được tìm thấy!",
-        error: true,
-        success: false,
-      });
-    }
     res.status(200).json({
       success: true,
       error: false,
@@ -147,426 +141,9 @@ module.exports.getProductByCategoryId = async (req, res) => {
     });
   }
 };
-//get product by category name
-module.exports.getProductByCategoryName = async (req, res) => {
-  try {
-    const page = parseInt(req.query.page) || 1;
-    const perPage = parseInt(req.query.perPage) || 4;
-    const totalProduct = await Product.countDocuments({
-      deleted: false,
-      catName: req.query.catName,
-    });
 
-    const totalPage = Math.ceil(totalProduct / perPage);
-
-    const product = await Product.find({
-      deleted: false,
-      catName: req.query.catName,
-    })
-      .populate("category")
-      .skip((page - 1) * perPage)
-      .limit(perPage)
-      .exec();
-    if (page > totalPage) {
-      return res.status(400).json({
-        message: "Trang không hợp lệ!",
-        success: false,
-        error: true,
-      });
-    }
-
-    if (!product) {
-      res.status(400).json({
-        message: error.message || error,
-        error: true,
-        success: false,
-      });
-    }
-    res.status(200).json({
-      success: true,
-      error: false,
-      products: product,
-      totalPages: totalPage,
-      page: page,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      message: error.message || error,
-      error: true,
-      success: false,
-    });
-  }
-};
-//get product by sub category id
-module.exports.getProductBySubCategoryId = async (req, res) => {
-  try {
-    const page = parseInt(req.query.page) || 1;
-    const perPage = parseInt(req.query.perPage) || 4;
-    const totalProduct = await Product.countDocuments({
-      deleted: false,
-      subCatId: req.query.id,
-    });
-
-    const totalPage = Math.ceil(totalProduct / perPage);
-
-    const product = await Product.find({
-      deleted: false,
-      subCatId: req.query.subCatId,
-    })
-      .populate("category")
-      .skip((page - 1) * perPage)
-      .limit(perPage)
-      .exec();
-    if (page > totalPage) {
-      return res.status(400).json({
-        message: "Trang không hợp lệ!",
-        success: false,
-        error: true,
-      });
-    }
-
-    if (!product) {
-      res.status(400).json({
-        message: error.message || error,
-        error: true,
-        success: false,
-      });
-    }
-    res.status(200).json({
-      success: true,
-      error: false,
-      products: product,
-      totalPages: totalPage,
-      page: page,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      message: error.message || error,
-      error: true,
-      success: false,
-    });
-  }
-};
-//get product by sub category name
-module.exports.getProductBySubCategoryName = async (req, res) => {
-  try {
-    const page = parseInt(req.query.page) || 1;
-    const perPage = parseInt(req.query.perPage) || 4;
-    const totalProduct = await Product.countDocuments({
-      deleted: false,
-      subCat: req.query.catName,
-    });
-
-    console.log(Math.ceil(totalProduct / perPage));
-    const totalPage = Math.ceil(totalProduct / perPage);
-
-    const product = await Product.find({
-      deleted: false,
-      subCat: req.query.subCat,
-    })
-      .populate("category")
-      .skip((page - 1) * perPage)
-      .limit(perPage)
-      .exec();
-    if (page > totalPage) {
-      return res.status(400).json({
-        message: "Trang không hợp lệ!",
-        success: false,
-        error: true,
-      });
-    }
-
-    if (!product) {
-      res.status(400).json({
-        message: error.message || error,
-        error: true,
-        success: false,
-      });
-    }
-    res.status(200).json({
-      success: true,
-      error: false,
-      products: product,
-      totalPages: totalPage,
-      page: page,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      message: error.message || error,
-      error: true,
-      success: false,
-    });
-  }
-};
-//get product by third sub category id
-module.exports.getProductByThirdSubCategoryId = async (req, res) => {
-  try {
-    const page = parseInt(req.query.page) || 1;
-    const perPage = parseInt(req.query.perPage) || 4;
-    const totalProduct = await Product.countDocuments({
-      deleted: false,
-      thirdSubCatId: req.query.id,
-    });
-
-    const totalPage = Math.ceil(totalProduct / perPage);
-
-    const product = await Product.find({
-      deleted: false,
-      thirdSubCatId: req.query.thirdSubCatId,
-    })
-      .populate("category")
-      .skip((page - 1) * perPage)
-      .limit(perPage)
-      .exec();
-    if (page > totalPage) {
-      return res.status(400).json({
-        message: "Trang không hợp lệ!",
-        success: false,
-        error: true,
-      });
-    }
-
-    if (!product) {
-      res.status(400).json({
-        message: error.message || error,
-        error: true,
-        success: false,
-      });
-    }
-    res.status(200).json({
-      success: true,
-      error: false,
-      products: product,
-      totalPages: totalPage,
-      page: page,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      message: error.message || error,
-      error: true,
-      success: false,
-    });
-  }
-};
-//get product by third sub category name
-module.exports.getProductByThirdSubCategoryName = async (req, res) => {
-  try {
-    const page = parseInt(req.query.page) || 1;
-    const perPage = parseInt(req.query.perPage) || 4;
-    const totalProduct = await Product.countDocuments({
-      deleted: false,
-      thirdSubCat: req.query.thirdSubCat,
-    });
-
-    const totalPage = Math.ceil(totalProduct / perPage);
-
-    const product = await Product.find({
-      deleted: false,
-      thirdSubCat: req.query.thirdSubCat,
-    })
-      .populate("category")
-      .skip((page - 1) * perPage)
-      .limit(perPage)
-      .exec();
-    if (page > totalPage) {
-      return res.status(400).json({
-        message: "Trang không hợp lệ!",
-        success: false,
-        error: true,
-      });
-    }
-
-    if (!product) {
-      res.status(400).json({
-        message: error.message || error,
-        error: true,
-        success: false,
-      });
-    }
-    res.status(200).json({
-      success: true,
-      error: false,
-      products: product,
-      totalPages: totalPage,
-      page: page,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      message: error.message || error,
-      error: true,
-      success: false,
-    });
-  }
-};
-//get product by price
-module.exports.getProductByPrice = async (req, res) => {
-  let productList = [];
-  if (req.query.catId != "" && req.query.catId != undefined) {
-    const productListArr = await Product.find({
-      deleted: false,
-      catId: req.query.catId,
-    }).populate("category");
-    productList = productListArr;
-  }
-  if (req.query.subCatId != "" && req.query.subCatId != undefined) {
-    const productListArr = await Product.find({
-      deleted: false,
-      subCatId: req.query.subCatId,
-    }).populate("category");
-    productList = productListArr;
-  }
-  if (req.query.thirdSubCatId != "" && req.query.thirdSubCatId != undefined) {
-    const productListArr = await Product.find({
-      deleted: false,
-      thirdSubCatId: req.query.thirdSubCatId,
-    }).populate("category");
-    productList = productListArr;
-  }
-  const filterProduct = productList.filter((product) => {
-    if (req.query.minPrice && product.price < parseInt(+req.query.minPrice)) {
-      return false;
-    }
-    if (req.query.maxPrice && product.price > parseInt(+req.query.maxPrice)) {
-      return false;
-    }
-    return true;
-  });
-  res.status(200).json({
-    error: false,
-    success: true,
-    products: filterProduct,
-    totalPages: 0,
-    page: 0,
-  });
-};
-//get product by rating
-module.exports.getProductByRating = async (req, res) => {
-  try {
-    const page = parseInt(req.query.page) || 1;
-    const perPage = parseInt(req.query.perPage) || 4;
-    const totalProduct = await Product.countDocuments({
-      deleted: false,
-      rating: req.query.rating,
-    });
-
-    const totalPage = Math.ceil(totalProduct / perPage);
-    let product = [];
-    if (req.query.catId !== undefined) {
-      product = await Product.find({
-        deleted: false,
-        rating: req.query.rating,
-        catId: req.query.catId,
-      })
-        .populate("category")
-        .skip((page - 1) * perPage)
-        .limit(perPage)
-        .exec();
-    }
-    if (req.query.subCatId !== undefined) {
-      product = await Product.find({
-        deleted: false,
-        rating: req.query.rating,
-
-        subCatId: req.query.subCatId,
-      })
-        .populate("category")
-        .skip((page - 1) * perPage)
-        .limit(perPage)
-        .exec();
-    }
-    if (req.query.thirdSubCatId !== undefined) {
-      product = await Product.find({
-        deleted: false,
-        thirdSubCatId: req.query.thirdSubCatId,
-      })
-        .populate("category")
-        .skip((page - 1) * perPage)
-        .limit(perPage)
-        .exec();
-    }
-    if (page > totalPage) {
-      return res.status(400).json({
-        message: "Trang không hợp lệ!",
-        success: false,
-        error: true,
-      });
-    }
-
-    if (!product) {
-      res.status(400).json({
-        message: error.message || error,
-        error: true,
-        success: false,
-      });
-    }
-    res.status(200).json({
-      success: true,
-      error: false,
-      products: product,
-      totalPages: totalPage,
-      page: page,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      message: error.message || error,
-      error: true,
-      success: false,
-    });
-  }
-};
-//product count
-module.exports.productCount = async (req, res) => {
-  try {
-    const productCount = await Product.countDocuments({ deleted: false });
-    if (!productCount) {
-      res.status(400).json({
-        success: false,
-        error: true,
-      });
-    }
-    return res.status(200).json({
-      error: false,
-      success: true,
-      countProduct: productCount,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      message: error.message || error,
-      error: true,
-      success: false,
-    });
-  }
-};
-//get product by featured
-module.exports.getProductByFeatured = async (req, res) => {
-  try {
-    const product = await Product.find({
-      deleted: false,
-      isFeatured: true,
-    }).populate("category");
-
-    if (!product) {
-      res.status(400).json({
-        message: error.message || error,
-        error: true,
-        success: false,
-      });
-    }
-    res.status(200).json({
-      success: true,
-      error: false,
-      products: product,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      message: error.message || error,
-      error: true,
-      success: false,
-    });
-  }
-};
-//delete Product
-module.exports.deleteProduct = async (req, res) => {
+//delete Product(vĩnh viễn)
+module.exports.deleteProductTrash = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id).populate("category");
     if (!product) {
@@ -577,7 +154,7 @@ module.exports.deleteProduct = async (req, res) => {
       });
     }
     if (product.public_id) {
-      await cloudinary.uploader.destroy(product.public_id);
+      cloudinary.uploader.destroy(product.public_id);
     }
     const deleteProduct = await Product.findByIdAndDelete(req.params.id);
     if (!deleteProduct) {
@@ -587,13 +164,90 @@ module.exports.deleteProduct = async (req, res) => {
         message: "Sản phẩm không được xóa!",
       });
     }
-    if (deleteProduct.public_id) {
-      await cloudinary.uploader.destroy(deleteProduct.public_id);
-    }
     return res.status(200).json({
       error: false,
       success: true,
       message: "Xóa thành công!",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message || error,
+      error: true,
+      success: false,
+    });
+  }
+};
+//delete Product(mềm)
+module.exports.deleteProduct = async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id).populate("category");
+    if (!product) {
+      res.status(400).json({
+        message: "Sản phẩm không được tìm thấy",
+        error: true,
+        success: false,
+      });
+    }
+    const deleteProduct = await Product.updateOne(
+      { _id: req.params.id },
+      {
+        deleted: true,
+        deletedBy: {
+          account_id: res.locals.userId,
+          deletedAt: new Date(),
+        },
+      }
+    );
+
+    if (!deleteProduct) {
+      res.status(400).json({
+        error: true,
+        success: false,
+        message: "Sản phẩm không được xóa!",
+      });
+    }
+
+    return res.status(200).json({
+      error: false,
+      success: true,
+      message: "Xóa thành công!",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message || error,
+      error: true,
+      success: false,
+    });
+  }
+};
+//restore Product
+module.exports.restoreProduct = async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id).populate("category");
+    if (!product) {
+      res.status(400).json({
+        message: "Sản phẩm không được tìm thấy",
+        error: true,
+        success: false,
+      });
+    }
+    const restoreProduct = await Product.updateOne(
+      { _id: req.params.id },
+      { deleted: false }
+    );
+
+    if (!restoreProduct) {
+      res.status(400).json({
+        error: true,
+        success: false,
+        message: "Sản phẩm không được khôi phục!",
+      });
+    }
+
+    return res.status(200).json({
+      error: false,
+      success: true,
+      message: "Khôi phục thành công!",
     });
   } catch (error) {
     return res.status(500).json({
@@ -656,8 +310,105 @@ module.exports.updateProduct = async (req, res) => {
       { new: true }
     );
 
-    res.json({ success: true, product: updated });
+    return res.json({ success: true, message: "Cập nhật sản phẩm thành công" });
   } catch (e) {
-    res.status(500).json({ success: false, message: e.message });
+    return res.status(500).json({ success: false, message: e.message });
+  }
+};
+//change-multi
+module.exports.changeMulti = async (req, res) => {
+  try {
+    const { type, ids } = req.body;
+
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Danh sách ID không hợp lệ!",
+      });
+    }
+
+    switch (type) {
+      case "delete-all":
+        await Product.updateMany(
+          { _id: { $in: ids } },
+          {
+            deleted: true,
+            deletedBy: {
+              account_id: res.locals.userId,
+              deletedAt: new Date(),
+            },
+          }
+        );
+        return res.json({ success: true, message: "Đã chuyển vào thùng rác!" });
+
+      case "delete-hard-all":
+        const products = await Product.find({ _id: { $in: ids } });
+
+        const allPublicIds = products
+          .flatMap((p) => p.images?.map((img) => img.public_id) || [])
+          .filter(Boolean); // <-- lọc null/undefined
+
+        if (allPublicIds.length > 0) {
+          await Promise.all(
+            allPublicIds.map((id) =>
+              cloudinary.uploader
+                .destroy(id)
+                .catch((err) => console.error("Cloudinary delete error:", err))
+            )
+          );
+        }
+
+        await Product.deleteMany({ _id: { $in: ids } });
+
+        return res.json({
+          success: true,
+          message: "Đã xóa vĩnh viễn tất cả sản phẩm thành công!",
+        });
+
+      default:
+        return res.status(400).json({
+          success: false,
+          message: "Yêu cầu không hợp lệ!",
+        });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message || error,
+      error: true,
+      success: false,
+    });
+  }
+};
+
+//get trash
+module.exports.getTrash = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const perPage = parseInt(req.query.perPage) || 4;
+
+    const product = await Product.find({ deleted: true })
+      .populate("category")
+      .populate("deletedBy.account_id", "name")
+      .skip((page - 1) * perPage)
+      .limit(perPage)
+      .exec();
+
+    const totalProduct = await Product.countDocuments({ deleted: true });
+    const totalPage = Math.ceil(totalProduct / perPage);
+
+    res.status(200).json({
+      success: true,
+      error: false,
+      products: product,
+      perPage: perPage,
+      page: page,
+      totalItems: totalProduct,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message || error,
+      error: true,
+      success: false,
+    });
   }
 };

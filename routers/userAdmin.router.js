@@ -18,6 +18,11 @@ router.post(
   uploadToCloud.uploadOne,
   controller.userAvatar
 );
+router.get("/", middleware.auth, controller.getAccount);
+router.get("/notApproved", middleware.auth, controller.getNotApproved);
+router.post("/notApproved/:id", middleware.auth, controller.updateApproved);
+router.patch("/updateRole/:id", middleware.auth, controller.updateRoleUser);
+router.delete("/deleteAccount/:id", middleware.auth, controller.deleteAccount);
 router.get("/user-detail", middleware.auth, controller.userDetail);
 router.post("/logout", middleware.auth, controller.logout);
 module.exports = router;

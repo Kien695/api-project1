@@ -557,3 +557,29 @@ module.exports.userDetail = async (req, res) => {
     });
   }
 };
+//delete user
+module.exports.deleteUser = async (req, res) => {
+  try {
+    const deleted = await User.findByIdAndDelete(req.params.id);
+    if (!deleted) {
+      return res.status(200).json({
+        message: "Người dùng không tồn tại",
+        error: true,
+
+        success: false,
+      });
+    }
+    return res.status(200).json({
+      message: "Xóa thành công",
+      error: false,
+
+      success: true,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      error: true,
+      success: false,
+      message: error.message || error,
+    });
+  }
+};

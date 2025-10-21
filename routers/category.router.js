@@ -13,12 +13,7 @@ router.post(
 
   controller.createCategory
 );
-router.get("/get/count", controller.getCategoryCount);
-router.get(
-  "/get/count/subCat",
 
-  controller.subGetCategoryCount
-);
 router.get("/:id", controller.getSingleCategory);
 
 router.delete("/delete/:id", middleware.auth, controller.deleteCategory);
