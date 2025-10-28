@@ -45,7 +45,10 @@ const productSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-
+    sale: {
+      type: Number,
+      default: 0,
+    },
     size: {
       type: [String],
       default: null,
@@ -55,10 +58,7 @@ const productSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    dateCreated: {
-      type: Date,
-      default: Date.now,
-    },
+
     deletedBy: {
       account_id: { type: mongoose.Schema.Types.ObjectId, ref: "AdminUser" },
       deletedAt: Date,

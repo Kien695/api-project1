@@ -1,10 +1,10 @@
-const User = require("../model/user.model");
+const User = require("../../model/user.model");
 const bcryptjs = require("bcryptjs");
 
 const jwt = require("jsonwebtoken");
-const { sendMail } = require("../config/sendEmail");
-const { generateAccessToken } = require("../utils/generatAccessToken");
-const { generateRefreshToken } = require("../utils/generateRefreshToken");
+const { sendMail } = require("../../config/sendEmail");
+const { generateAccessToken } = require("../../utils/generatAccessToken");
+const { generateRefreshToken } = require("../../utils/generateRefreshToken");
 const cloudinary = require("cloudinary").v2;
 const fs = require("fs");
 cloudinary.config({

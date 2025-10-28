@@ -1,12 +1,13 @@
 const express = require("express");
 const router = express.Router();
 const multer = require("multer");
-const controller = require("../controller/product.controller");
+const controller = require("../controller/admin/product.controller");
 const middleware = require("../middleware/auth.middleware");
 const upload = multer();
 const uploadToCloud = require("../middleware/uploadCloud.midleware");
 
 router.get("/", controller.getProduct);
+
 router.get("/trash", controller.getTrash);
 
 router.patch("/deleteProduct/:id", middleware.auth, controller.deleteProduct);

@@ -1,4 +1,4 @@
-const BannerHome = require("../model/bannerHome.model");
+const BannerHome = require("../../model/bannerHome.model");
 const cloudinary = require("cloudinary").v2;
 const fs = require("fs");
 cloudinary.config({

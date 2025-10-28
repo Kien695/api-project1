@@ -1,4 +1,4 @@
-const MyList = require("../model/myList.model");
+const MyList = require("../../model/myList.model");
 //thêm
 module.exports.addToMyList = async (req, res) => {
   try {

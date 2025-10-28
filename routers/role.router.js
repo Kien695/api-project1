@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const controller = require("../controller/role.controller");
+const controller = require("../controller/admin/role.controller");
 const middleware = require("../middleware/auth.middleware");
 
 router.get("/", controller.getRole);

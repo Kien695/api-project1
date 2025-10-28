@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const multer = require("multer");
 const upload = multer();
-const controller = require("../controller/logo.controller");
+const controller = require("../controller/admin/logo.controller");
 const middleware = require("../middleware/auth.middleware");
 const uploadCloud = require("../middleware/uploadCloud.midleware");
 router.get("/", controller.getLogo);

@@ -5,7 +5,7 @@ const middleware = require("../middleware/auth.middleware");
 const multer = require("multer");
 const upload = multer();
 const uploadToCloud = require("../middleware/uploadCloud.midleware");
-const controller = require("../controller/userAdmin.controller");
+const controller = require("../controller/admin/userAdmin.controller");
 router.post("/register", controller.register);
 router.post("/login", controller.login);
 router.post("/verifyEmail", controller.verifyEmail);

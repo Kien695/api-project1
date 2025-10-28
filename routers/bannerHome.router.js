@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const multer = require("multer");
 const upload = multer();
-const controller = require("../controller/banner.controller");
+const controller = require("../controller/admin/banner.controller");
 const middleware = require("../middleware/auth.middleware");
 const uploadCloud = require("../middleware/uploadCloud.midleware");
 router.get("/", controller.getBanner);

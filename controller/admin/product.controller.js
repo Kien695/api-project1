@@ -1,8 +1,8 @@
-const Product = require("../model/product.model");
-const UserAdmin = require("../model/userAdmin.model");
-const Category = require("../model/category.model");
-const searchHelper = require("../Helper/Search");
-const categoryHelper = require("../Helper/categoryAllFIlter");
+const Product = require("../../model/product.model");
+const UserAdmin = require("../../model/userAdmin.model");
+const Category = require("../../model/category.model");
+const searchHelper = require("../../Helper/Search");
+const categoryHelper = require("../../Helper/categoryAllFIlter");
 const cloudinary = require("cloudinary").v2;
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
@@ -96,51 +96,51 @@ module.exports.getProduct = async (req, res) => {
   }
 };
 //get product by category id
-module.exports.getProductByCategoryId = async (req, res) => {
-  try {
-    const page = parseInt(req.query.page) || 1;
-    const perPage = parseInt(req.query.perPage) || 4;
-    const totalProduct = await Product.countDocuments({
-      deleted: false,
-      catId: req.params.id,
-    });
-    const totalPage = Math.ceil(totalProduct / perPage);
+// module.exports.getProductByCategoryId = async (req, res) => {
+//   try {
+//     const page = parseInt(req.query.page) || 1;
+//     const perPage = parseInt(req.query.perPage) || 4;
+//     const totalProduct = await Product.countDocuments({
+//       deleted: false,
+//       catId: req.params.id,
+//     });
+//     const totalPage = Math.ceil(totalProduct / perPage);
 
-    const product = await Product.find({ deleted: false, catId: req.params.id })
-      .populate("category")
-      .skip((page - 1) * perPage)
-      .limit(perPage)
-      .exec();
-    if (page > totalPage) {
-      return res.status(400).json({
-        message: "Trang không hợp lệ!",
-        success: false,
-        error: true,
-      });
-    }
+//     const product = await Product.find({ deleted: false, catId: req.params.id })
+//       .populate("category")
+//       .skip((page - 1) * perPage)
+//       .limit(perPage)
+//       .exec();
+//     if (page > totalPage) {
+//       return res.status(400).json({
+//         message: "Trang không hợp lệ!",
+//         success: false,
+//         error: true,
+//       });
+//     }
 
-    if (!product) {
-      res.status(400).json({
-        message: error.message || error,
-        error: true,
-        success: false,
-      });
-    }
-    res.status(200).json({
-      success: true,
-      error: false,
-      products: product,
-      totalPages: totalPage,
-      page: page,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      message: error.message || error,
-      error: true,
-      success: false,
-    });
-  }
-};
+//     if (!product) {
+//       res.status(400).json({
+//         message: error.message || error,
+//         error: true,
+//         success: false,
+//       });
+//     }
+//     res.status(200).json({
+//       success: true,
+//       error: false,
+//       products: product,
+//       totalPages: totalPage,
+//       page: page,
+//     });
+//   } catch (error) {
+//     return res.status(500).json({
+//       message: error.message || error,
+//       error: true,
+//       success: false,
+//     });
+//   }
+// };
 
 //delete Product(vĩnh viễn)
 module.exports.deleteProductTrash = async (req, res) => {

@@ -1,10 +1,10 @@
-const UserAdmin = require("../model/userAdmin.model");
+const UserAdmin = require("../../model/userAdmin.model");
 const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const cloudinary = require("cloudinary").v2;
-const { sendMail } = require("../config/sendEmail");
-const { generateAccessToken } = require("../utils/generatAccessToken");
-const { generateRefreshToken } = require("../utils/generateRefreshToken");
+const { sendMail } = require("../../config/sendEmail");
+const { generateAccessToken } = require("../../utils/generatAccessToken");
+const { generateRefreshToken } = require("../../utils/generateRefreshToken");
 //create
 module.exports.register = async (req, res) => {
   try {

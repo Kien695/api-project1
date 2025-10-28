@@ -1,5 +1,5 @@
-const Category = require("../model/category.model");
-const categoryTree = require("../Helper/categoryTree");
+const Category = require("../../model/category.model");
+const categoryTree = require("../../Helper/categoryTree");
 const cloudinary = require("cloudinary").v2;
 const fs = require("fs");
 cloudinary.config({

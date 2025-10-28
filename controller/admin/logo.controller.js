@@ -1,4 +1,4 @@
-const Logo = require("../model/logo.model");
+const Logo = require("../../model/logo.model");
 const cloudinary = require("cloudinary").v2;
 const fs = require("fs");
 cloudinary.config({

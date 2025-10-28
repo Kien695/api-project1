@@ -1,7 +1,7 @@
-const Product = require("../model/product.model");
-const User = require("../model/user.model");
-const Order = require("../model/order.model");
-const Category = require("../model/category.model");
+const Product = require("../../model/product.model");
+const User = require("../../model/user.model");
+const Order = require("../../model/order.model");
+const Category = require("../../model/category.model");
 //[get]
 module.exports.dashboard = async (req, res) => {
   try {
