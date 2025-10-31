@@ -1,8 +1,8 @@
 const mongoose = require("mongoose");
 const myListSchema = new mongoose.Schema(
   {
-    productId: {
-      type: String,
+    product: {
+      type: mongoose.Schema.Types.ObjectId,
       ref: "Product",
     },
 
@@ -10,39 +10,6 @@ const myListSchema = new mongoose.Schema(
       type: String,
       ref: "User",
     },
-    productTitle: {
-      type: String,
-
-      required: true,
-    },
-    description: {
-      type: String,
-      required: true,
-    },
-    images: [
-      {
-        type: String,
-        required: true,
-      },
-    ],
-    brand: {
-      type: String,
-      default: "",
-    },
-    price: {
-      type: Number,
-      default: 0,
-    },
-    discountPercentage: {
-      type: Number,
-      default: 0,
-    },
-
-    rating: {
-      type: Number,
-      default: 0,
-    },
-
     deleted: {
       type: Boolean,
       default: false,

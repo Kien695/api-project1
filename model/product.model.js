@@ -1,10 +1,17 @@
 const mongoose = require("mongoose");
+const slug = require("mongoose-slug-updater");
+mongoose.plugin(slug);
 const productSchema = new mongoose.Schema(
   {
     name: {
       type: String,
 
       required: true,
+    },
+    slug: {
+      type: String,
+      slug: "name",
+      unique: true,
     },
     description: {
       type: String,

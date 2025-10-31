@@ -3,27 +3,16 @@ const MyList = require("../../model/myList.model");
 module.exports.addToMyList = async (req, res) => {
   try {
     const userId = res.locals.userId;
-    const item = await MyList.findOne({
-      userId: userId,
-      productId: req.body.productId,
-    });
+    const productId = req.params.id;
 
-    if (item) {
-      res.status(400).json({
-        message: "Sản phẩm đã tồn tại trong danh sách yêu thich",
-        error: true,
-        success: false,
-      });
-    } else {
-      const myList = new MyList({ userId, ...req.body });
-      const save = await myList.save();
-      return res.status(200).json({
-        data: save,
-        message: "Sản phẩm được thêm vào danh sách yêu thích",
-        error: false,
-        success: true,
-      });
-    }
+    const myList = new MyList({ userId: userId, product: productId });
+    const save = await myList.save();
+    return res.status(200).json({
+      data: save,
+      message: "Sản phẩm được thêm vào danh sách yêu thích",
+      error: false,
+      success: true,
+    });
   } catch (error) {
     return res.status(500).json({
       message: error.message || error,
@@ -35,6 +24,7 @@ module.exports.addToMyList = async (req, res) => {
 //xóa
 module.exports.deleteMyList = async (req, res) => {
   try {
+    console.log(req.params.id);
     const myListItem = await MyList.findById(req.params.id);
     if (!myListItem) {
       res.status(400).json({
@@ -57,14 +47,36 @@ module.exports.deleteMyList = async (req, res) => {
     });
   }
 };
+//xóa tất cả
+module.exports.deleteAllMyList = async (req, res) => {
+  try {
+    const userId = res.locals.userId;
+    const deleteAll = await MyList.deleteMany({ userId: userId });
+    return res.status(200).json({
+      message: "Đã xóa tất cả sản phẩm khỏi danh sách yêu thích",
+      error: false,
+      success: true,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message || error,
+      error: true,
+      success: false,
+    });
+  }
+};
 //lấy
 module.exports.getMyList = async (req, res) => {
   try {
-    const myList = await MyList.find({
+    const countList = await MyList.countDocuments({
       userId: res.locals.userId,
     });
+    const myList = await MyList.find({
+      userId: res.locals.userId,
+    }).populate("product");
     res.status(200).json({
       data: myList,
+      countList: countList,
       error: true,
       success: false,
     });

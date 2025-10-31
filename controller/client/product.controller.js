@@ -1,4 +1,7 @@
+const mongoose = require("mongoose");
 const Product = require("../../model/product.model");
+const categoryHelper = require("../../Helper/categoryAllFIlter");
+const Category = require("../../model/category.model");
 //get product
 module.exports.getProduct = async (req, res) => {
   try {
@@ -17,10 +20,19 @@ module.exports.getProduct = async (req, res) => {
         createdAt: -1,
       })
       .limit(7);
-    const productSale = await Product.find({
+    const catId = req.query.catId;
+
+    let find = {
       deleted: false,
-    })
+    };
+    const category = await Category.findOne({ _id: catId });
+    if (category) {
+      const categoryIds = await categoryHelper(category._id);
+      find.category = { $in: categoryIds };
+    }
+    const productSale = await Product.find(find)
       .sort({ sale: -1 })
+      .populate("category")
       .limit(7);
     return res.json({
       dataFeatured: productFeatured,
@@ -41,12 +53,42 @@ module.exports.getProduct = async (req, res) => {
 module.exports.getAllProduct = async (req, res) => {
   try {
     const page = req.query.page || 1;
+    const maxPrice = parseInt(req.query?.maxPrice);
+    const minPrice = parseInt(req.query?.minPrice);
+    let find = {
+      deleted: false,
+    };
+    if (!isNaN(maxPrice) && !isNaN(minPrice)) {
+      find.price = {};
+      find.price.$gte = minPrice;
+      find.price.$lte = maxPrice;
+    }
 
-    const totalProduct = await Product.countDocuments({ deleted: false });
+    const catId = req.query.catId;
+
+    let category;
+    if (mongoose.Types.ObjectId.isValid(catId)) {
+      category = await Category.findOne({ _id: catId });
+    } else {
+      category = await Category.findOne({ slug: catId });
+    }
+    if (category) {
+      const categoryIds = await categoryHelper(category._id);
+      find.category = { $in: categoryIds };
+    }
+    //sort
+    let sort = {};
+    if (req.query.sortKey && req.query.sortValue) {
+      sort[req.query.sortKey] = req.query.sortValue;
+    } else {
+      sort.price = "asc";
+    }
+    const totalProduct = await Product.countDocuments(find);
     const totalPage = Math.ceil(totalProduct / 11);
-    const product = await Product.find({ deleted: false })
+    const product = await Product.find(find)
       .populate("category")
       .limit(11)
+      .sort(sort)
       .skip((page - 1) * 11);
     res.json({
       data: product,
