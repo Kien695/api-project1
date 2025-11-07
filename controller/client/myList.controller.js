@@ -77,8 +77,8 @@ module.exports.getMyList = async (req, res) => {
     res.status(200).json({
       data: myList,
       countList: countList,
-      error: true,
-      success: false,
+      error: false,
+      success: true,
     });
   } catch (error) {
     return res.status(500).json({

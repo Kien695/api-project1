@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const Product = require("../../model/product.model");
 const categoryHelper = require("../../Helper/categoryAllFIlter");
 const Category = require("../../model/category.model");
+const searchHelper = require("../../Helper/Search");
 //get product
 module.exports.getProduct = async (req, res) => {
   try {
@@ -58,6 +59,13 @@ module.exports.getAllProduct = async (req, res) => {
     let find = {
       deleted: false,
     };
+    //search
+    const objectSearch = searchHelper(req.query);
+
+    if (objectSearch.regex) {
+      find.name = objectSearch.regex;
+    }
+    //price filter
     if (!isNaN(maxPrice) && !isNaN(minPrice)) {
       find.price = {};
       find.price.$gte = minPrice;

@@ -5,14 +5,19 @@ const addressSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
-    city: {
+    province: {
       type: String,
       default: "",
     },
-    fullName: {
+    district: {
       type: String,
       default: "",
     },
+    ward: {
+      type: String,
+      default: "",
+    },
+
     pinCode: {
       type: String,
     },
@@ -20,17 +25,13 @@ const addressSchema = new mongoose.Schema(
       type: String,
       default: "Home",
     },
-    mobile: {
-      type: String,
-      default: null,
-    },
     status: {
       type: Boolean,
       default: true,
     },
     userId: {
-      type: mongoose.Schema.ObjectId,
-      default: "",
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
     },
   },
   {

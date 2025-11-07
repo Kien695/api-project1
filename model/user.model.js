@@ -3,7 +3,6 @@ const userSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: [true, "Vui lòng nhập tên"],
     },
     email: {
       type: String,
@@ -12,7 +11,9 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: [true, "Vui lòng nhập password"],
+    },
+    googleId: {
+      type: String,
     },
     avatar: {
       type: String,

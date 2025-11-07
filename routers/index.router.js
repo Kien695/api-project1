@@ -5,11 +5,13 @@ const productRouter = require("./product.router");
 const productClientRouter = require("./productClient.router");
 const cartRouter = require("./cart.router");
 const myListRouter = require("./myList.router");
+const addressRouter = require("./address.router");
 const adminUser = require("./userAdmin.router");
 const bannerHome = require("./bannerHome.router");
 const blogRouter = require("./blog.router");
 const logoRouter = require("./logo.router");
 const roleRouter = require("./role.router");
+const authRouter = require("./auth.router");
 module.exports = (app) => {
   app.use("/api/dashboard", homeRouter);
   app.use("/api/user", clientRouter);
@@ -18,9 +20,11 @@ module.exports = (app) => {
   app.use("/api/productClient", productClientRouter);
   app.use("/api/cart", cartRouter);
   app.use("/api/myList", myListRouter);
+  app.use("/api/address", addressRouter);
   app.use("/api/userAdmin", adminUser);
   app.use("/api/banner", bannerHome);
   app.use("/api/blog", blogRouter);
   app.use("/api/logo", logoRouter);
   app.use("/api/role", roleRouter);
+  app.use("/auth", authRouter);
 };
