@@ -6,6 +6,8 @@ module.exports.addToCart = async (req, res) => {
     const userId = res.locals.userId;
     const productId = req.body.productId;
     const quantity = parseInt(req.body.quantity);
+    const size = req.body.size;
+    console.log(size);
     if (!productId) {
       return res.status(400).json({
         message: "Không tìm thấy sản phẩm",
@@ -17,7 +19,7 @@ module.exports.addToCart = async (req, res) => {
       userId: userId,
       productId: productId,
     });
-    if (checkItemCart) {
+    if (checkItemCart && size === checkItemCart.size) {
       checkItemCart.quantity += quantity;
       const updated = await checkItemCart.save();
       res.status(200).json({
@@ -29,6 +31,7 @@ module.exports.addToCart = async (req, res) => {
     } else {
       const cartItem = new Cart({
         quantity: quantity,
+        size: size,
         userId: userId,
         productId: productId,
       });
@@ -41,7 +44,7 @@ module.exports.addToCart = async (req, res) => {
       );
       return res.status(200).json({
         data: save,
-        message: "Thêm vật phẩm thành công",
+        message: "Thêm sản phẩm thành công",
         error: false,
         success: true,
       });
@@ -58,11 +61,13 @@ module.exports.addToCart = async (req, res) => {
 module.exports.getCartItem = async (req, res) => {
   try {
     const userId = res.locals.userId;
+    let countCart = await Cart.countDocuments({ userId: userId });
     const itemCart = await Cart.find({
       userId: userId,
     }).populate("productId");
     return res.status(200).json({
       data: itemCart,
+      countCart: countCart,
       success: true,
       error: false,
     });
@@ -105,13 +110,11 @@ module.exports.updateQuantityCart = async (req, res) => {
 module.exports.deleteCartItem = async (req, res) => {
   try {
     const userId = res.locals.userId;
-    const { _id, productId } = req.body;
-    if (!_id) {
-      res.status(400).json({
-        message: "Vui lòng cung cấp đủ thông tin",
-      });
-    }
-    const deleteItemCart = await Cart.deleteOne({ _id: _id, userId: userId });
+    const id = req.params.id;
+    const productId = req.body.productId;
+    console.log(productId);
+    console.log(id);
+    const deleteItemCart = await Cart.deleteOne({ _id: id, userId: userId });
     if (!deleteItemCart) {
       res.status(400).json({
         message: "Sản phẩm trong giỏ hàng không được tìm thấy",
@@ -130,7 +133,7 @@ module.exports.deleteCartItem = async (req, res) => {
     user.shopping_Cart = updateUserCart;
     await user.save();
     return res.status(200).json({
-      message: "Sản phẩm đã được xóa",
+      message: "Sản phẩm đã được xóa khỏi giỏ hàng",
       error: false,
       success: true,
     });

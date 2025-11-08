@@ -9,6 +9,10 @@ const cartProductSchema = new mongoose.Schema(
       type: Number,
       default: 1,
     },
+    size: {
+      type: String,
+      default: "S",
+    },
     userId: {
       type: mongoose.Schema.ObjectId,
       ref: "User",

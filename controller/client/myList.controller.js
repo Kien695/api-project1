@@ -24,7 +24,6 @@ module.exports.addToMyList = async (req, res) => {
 //xóa
 module.exports.deleteMyList = async (req, res) => {
   try {
-    console.log(req.params.id);
     const myListItem = await MyList.findById(req.params.id);
     if (!myListItem) {
       res.status(400).json({
