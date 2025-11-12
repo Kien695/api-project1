@@ -75,6 +75,7 @@ module.exports.delete = async (req, res) => {
 module.exports.permission = async (req, res) => {
   try {
     const permissions = req.body;
+
     for (const item of permissions) {
       await Role.updateOne({ _id: item.id }, { permissions: item.permissions });
     }

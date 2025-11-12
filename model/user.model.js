@@ -49,12 +49,7 @@ const userSchema = new mongoose.Schema(
       type: mongoose.Schema.ObjectId,
       ref: "address",
     },
-    shopping_Cart: [
-      {
-        type: mongoose.Schema.ObjectId,
-        ref: "CartProduct",
-      },
-    ],
+
     orderHistory: {
       type: mongoose.Schema.ObjectId,
       ref: "order",

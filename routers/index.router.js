@@ -12,6 +12,9 @@ const blogRouter = require("./blog.router");
 const logoRouter = require("./logo.router");
 const roleRouter = require("./role.router");
 const authRouter = require("./auth.router");
+const checkoutRouter = require("./checkout.router");
+const orderRouter = require("./order.router");
+const orderAdminRouter = require("./orderAdmin.router");
 module.exports = (app) => {
   app.use("/api/dashboard", homeRouter);
   app.use("/api/user", clientRouter);
@@ -27,4 +30,7 @@ module.exports = (app) => {
   app.use("/api/logo", logoRouter);
   app.use("/api/role", roleRouter);
   app.use("/auth", authRouter);
+  app.use("/api/checkout", checkoutRouter);
+  app.use("/api/order", orderRouter);
+  app.use("/api/orderAdmin", orderAdminRouter);
 };

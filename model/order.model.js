@@ -5,20 +5,28 @@ const orderSchema = new mongoose.Schema(
       type: mongoose.Schema.ObjectId,
       ref: "User",
     },
-    orderId: {
-      type: String,
-      required: [true, "Provide orderId"],
-      unique: true,
-    },
-    productId: {
-      type: mongoose.Schema.ObjectId,
-      ref: "User",
-    },
-    product_details: {
-      name: String,
-      image: Array,
-    },
-    paymentId: {
+
+    productItems: [
+      {
+        productId: {
+          type: mongoose.Schema.ObjectId,
+          ref: "Product",
+          required: true,
+        },
+        quantity: { type: Number, required: true },
+        price: { type: Number, required: true },
+        size: { type: String },
+        order_status: {
+          type: String,
+        },
+        deleted: {
+          type: Boolean,
+          default: false,
+        },
+      },
+    ],
+
+    paymentMethod: {
       type: String,
       default: "",
     },
@@ -27,20 +35,15 @@ const orderSchema = new mongoose.Schema(
       default: "",
     },
     delivery_address: {
-      type: mongoose.Schema.ObjectId,
-      ref: "address",
-    },
-    subTotalAmt: {
-      type: Number,
-      default: "",
-    },
-    TotalAmt: {
-      type: Number,
-      default: "",
-    },
-    invoice_receipt: {
       type: String,
-      default: "",
+    },
+    deleted: {
+      type: Boolean,
+      default: false,
+    },
+
+    totalAmount: {
+      type: Number,
     },
   },
   {
