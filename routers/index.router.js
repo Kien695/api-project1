@@ -8,6 +8,7 @@ const myListRouter = require("./myList.router");
 const addressRouter = require("./address.router");
 const adminUser = require("./userAdmin.router");
 const bannerHome = require("./bannerHome.router");
+const bannerList = require("./bannerList.router");
 const blogRouter = require("./blog.router");
 const logoRouter = require("./logo.router");
 const roleRouter = require("./role.router");
@@ -26,6 +27,7 @@ module.exports = (app) => {
   app.use("/api/address", addressRouter);
   app.use("/api/userAdmin", adminUser);
   app.use("/api/banner", bannerHome);
+  app.use("/api/bannerList", bannerList);
   app.use("/api/blog", blogRouter);
   app.use("/api/logo", logoRouter);
   app.use("/api/role", roleRouter);

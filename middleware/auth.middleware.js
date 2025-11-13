@@ -23,7 +23,7 @@ module.exports.auth = async (req, res, next) => {
     return res.status(500).json({
       error: true,
       success: false,
-      message: error.message || error,
+      message: "Vui lòng đăng nhập!",
     });
   }
 };

@@ -7,10 +7,10 @@ module.exports.payMent = async (req, res) => {
     const amount = parseInt(req.query.amount);
 
     // --- Thông tin VNPay (sandbox)
-    const vnp_TmnCode = "3PA3GEGK";
-    const vnp_HashSecret = "YRMBQAI9F5YFURG8JKTB2Q36RIO5DLPZ";
+    const vnp_TmnCode = process.env.TMN_CODE;
+    const vnp_HashSecret = process.env.HASH_SECRET;
     const vnp_Url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-    const vnp_ReturnUrl = "http://localhost:5173/result";
+    const vnp_ReturnUrl = process.env.RETURN_URL;
 
     // --- Lấy IP người dùng (phòng khi req.ip bị sai định dạng)
     const ipAddr =
