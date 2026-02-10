@@ -12,7 +12,7 @@ module.exports.getBanner = async (req, res) => {
   try {
     const banner = await BannerHome.find();
     if (!banner) {
-      return res.status(400).json({
+      return res.status(404).json({
         error: true,
         success: false,
       });
@@ -78,7 +78,7 @@ module.exports.edit = async (req, res) => {
     const updated = await BannerHome.findByIdAndUpdate(
       req.params.id,
       updateData,
-      { new: true }
+      { new: true },
     );
     if (req.body.avatar_public_id && oldBanner.images_public_id) {
       cloudinary.uploader.destroy(oldBanner.images_public_id);
@@ -145,8 +145,8 @@ module.exports.deleteAll = async (req, res) => {
       publicIds.map((pid) =>
         cloudinary.uploader
           .destroy(pid)
-          .catch((err) => console.error("Cloudinary delete error:", err))
-      )
+          .catch((err) => console.error("Cloudinary delete error:", err)),
+      ),
     );
 
     // Sau khi xóa ảnh thì xóa trong DB

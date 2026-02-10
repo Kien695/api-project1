@@ -3,6 +3,7 @@ const Order = require("../../model/order.model");
 module.exports.getOrder = async (req, res) => {
   try {
     const orders = await Order.find({ deleted: false })
+      .sort({ createdAt: -1 })
       .populate("productItems.productId", "_id name images brand size")
       .populate("userId", "name email mobile");
 
@@ -18,7 +19,7 @@ module.exports.getOrder = async (req, res) => {
       .map((order) => ({
         ...order._doc,
         productItems: order.productItems.filter(
-          (item) => item.deleted !== true
+          (item) => item.deleted !== true,
         ),
       }))
       .filter((order) => order.productItems.length > 0); // chỉ giữ order còn productItem
@@ -48,13 +49,14 @@ module.exports.updateStatus = async (req, res) => {
     const order = await Order.findById(orderId);
     if (order) {
       const index = order.productItems.findIndex(
-        (item) => item.productId.toString() === productId && item.size == size
+        (item) => item.productId.toString() === productId && item.size == size,
       );
       if (action == "delivering") {
         order.productItems[index].order_status = "delivering";
       }
       if (action == "confirm") {
         order.productItems[index].order_status = "confirm";
+        order.payment_status = "yes";
       }
       await order.save();
       return res.status(200).json({
@@ -85,7 +87,7 @@ module.exports.deleteOrder = async (req, res) => {
     const order = await Order.findById(orderId);
     if (order) {
       const index = order.productItems.findIndex(
-        (item) => item.productId.toString() === productId && item.size == size
+        (item) => item.productId.toString() === productId && item.size == size,
       );
       if (index === -1) {
         return res.status(404).json({
@@ -106,7 +108,7 @@ module.exports.deleteOrder = async (req, res) => {
           await Order.findByIdAndUpdate(
             orderId,
             { deleted: true },
-            { new: true }
+            { new: true },
           );
         }
       }

@@ -53,7 +53,7 @@ module.exports.deleteBlog = async (req, res) => {
     const oldBlog = await Blog.findById(req.params.id);
 
     if (!oldBlog) {
-      return req.status(400).json({
+      return res.status(404).json({
         message: "Blog không tồn tại",
         error: true,
         success: false,

@@ -2,21 +2,22 @@ const express = require("express");
 const router = express.Router();
 const middleware = require("../middleware/auth.middleware");
 const controller = require("../controller/client/user.controller");
+const validate = require("../validates/admin/auth.validate");
 // const upload = require("../middleware/multer");
 const multer = require("multer");
 const upload = multer();
 const uploadToCloud = require("../middleware/uploadCloud.midleware");
 router.get("/", controller.getUser);
-router.post("/register", controller.register);
-router.post("/verifyEmail", controller.verifyEmail);
-router.post("/login", controller.login);
+router.post("/register", validate.register, controller.register);
+router.post("/verifyEmail", validate.verify, controller.verifyEmail);
+router.post("/login", validate.login, controller.login);
 router.post("/logout", middleware.auth, controller.logout);
 router.put(
   "/user-avatar",
   middleware.auth,
   upload.single("avatar"),
   uploadToCloud.uploadOne,
-  controller.userAvatar
+  controller.userAvatar,
 );
 router.delete("/deleteImage", middleware.auth, controller.removeImage);
 router.put("/:id", middleware.auth, controller.updateUser);

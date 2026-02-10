@@ -27,7 +27,7 @@ module.exports.createProduct = async (req, res) => {
       message: "Tạo sản phẩm thành công",
       error: false,
       success: true,
-      product: product.toObject(),
+      
     });
   } catch (error) {
     return res.status(500).json({
@@ -95,52 +95,6 @@ module.exports.getProduct = async (req, res) => {
     });
   }
 };
-//get product by category id
-// module.exports.getProductByCategoryId = async (req, res) => {
-//   try {
-//     const page = parseInt(req.query.page) || 1;
-//     const perPage = parseInt(req.query.perPage) || 4;
-//     const totalProduct = await Product.countDocuments({
-//       deleted: false,
-//       catId: req.params.id,
-//     });
-//     const totalPage = Math.ceil(totalProduct / perPage);
-
-//     const product = await Product.find({ deleted: false, catId: req.params.id })
-//       .populate("category")
-//       .skip((page - 1) * perPage)
-//       .limit(perPage)
-//       .exec();
-//     if (page > totalPage) {
-//       return res.status(400).json({
-//         message: "Trang không hợp lệ!",
-//         success: false,
-//         error: true,
-//       });
-//     }
-
-//     if (!product) {
-//       res.status(400).json({
-//         message: error.message || error,
-//         error: true,
-//         success: false,
-//       });
-//     }
-//     res.status(200).json({
-//       success: true,
-//       error: false,
-//       products: product,
-//       totalPages: totalPage,
-//       page: page,
-//     });
-//   } catch (error) {
-//     return res.status(500).json({
-//       message: error.message || error,
-//       error: true,
-//       success: false,
-//     });
-//   }
-// };
 
 //delete Product(vĩnh viễn)
 module.exports.deleteProductTrash = async (req, res) => {
@@ -196,7 +150,7 @@ module.exports.deleteProduct = async (req, res) => {
           account_id: res.locals.userId,
           deletedAt: new Date(),
         },
-      }
+      },
     );
 
     if (!deleteProduct) {
@@ -233,7 +187,7 @@ module.exports.restoreProduct = async (req, res) => {
     }
     const restoreProduct = await Product.updateOne(
       { _id: req.params.id },
-      { deleted: false }
+      { deleted: false },
     );
 
     if (!restoreProduct) {
@@ -297,7 +251,7 @@ module.exports.updateProduct = async (req, res) => {
 
     // Xóa ảnh bị bỏ đi
     const imagesToDelete = oldProduct.images.filter(
-      (oldImg) => !newImages.some((img) => img.public_id === oldImg.public_id)
+      (oldImg) => !newImages.some((img) => img.public_id === oldImg.public_id),
     );
     for (const img of imagesToDelete) {
       if (img.public_id) await cloudinary.uploader.destroy(img.public_id);
@@ -307,7 +261,7 @@ module.exports.updateProduct = async (req, res) => {
     const updated = await Product.findByIdAndUpdate(
       req.params.id,
       { ...req.body, images: newImages },
-      { new: true }
+      { new: true },
     );
 
     return res.json({ success: true, message: "Cập nhật sản phẩm thành công" });
@@ -337,7 +291,7 @@ module.exports.changeMulti = async (req, res) => {
               account_id: res.locals.userId,
               deletedAt: new Date(),
             },
-          }
+          },
         );
         return res.json({ success: true, message: "Đã chuyển vào thùng rác!" });
 
@@ -353,8 +307,8 @@ module.exports.changeMulti = async (req, res) => {
             allPublicIds.map((id) =>
               cloudinary.uploader
                 .destroy(id)
-                .catch((err) => console.error("Cloudinary delete error:", err))
-            )
+                .catch((err) => console.error("Cloudinary delete error:", err)),
+            ),
           );
         }
 

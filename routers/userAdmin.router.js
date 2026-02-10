@@ -6,17 +6,18 @@ const multer = require("multer");
 const upload = multer();
 const uploadToCloud = require("../middleware/uploadCloud.midleware");
 const controller = require("../controller/admin/userAdmin.controller");
-router.post("/register", controller.register);
-router.post("/login", controller.login);
-router.post("/verifyEmail", controller.verifyEmail);
-router.put("/:id", middleware.auth, controller.updateUser);
+const validate = require("../validates/admin/auth.validate");
+router.post("/register", validate.register, controller.register);
+router.post("/login", validate.login, controller.login);
+router.post("/verifyEmail", validate.verify, controller.verifyEmail);
+router.put("/updateInfo", middleware.auth, controller.updateUser);
 router.post(
   "/user-avatar",
   middleware.auth,
   upload.single("avatar"),
 
   uploadToCloud.uploadOne,
-  controller.userAvatar
+  controller.userAvatar,
 );
 router.get("/", middleware.auth, controller.getAccount);
 router.get("/notApproved", middleware.auth, controller.getNotApproved);

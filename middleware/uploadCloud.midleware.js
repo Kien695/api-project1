@@ -26,10 +26,10 @@ module.exports.upload = async (req, res, next) => {
                     public_id: result.public_id,
                   });
                 } else reject(error);
-              }
+              },
             );
             streamifier.createReadStream(file.buffer).pipe(stream);
-          })
+          }),
       );
       newImages = await Promise.all(uploadPromises);
     }

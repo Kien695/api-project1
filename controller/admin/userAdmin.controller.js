@@ -10,13 +10,6 @@ module.exports.register = async (req, res) => {
   try {
     let account;
     const { name, email, password } = req.body;
-    if (!name || !email || !password) {
-      res.status(400).json({
-        message: "Vui lòng nhập đầy đủ thông tin",
-        error: true,
-        success: false,
-      });
-    }
     account = await UserAdmin.findOne({ email: email, deleted: false });
     if (account) {
       return res.status(400).json({
@@ -39,18 +32,11 @@ module.exports.register = async (req, res) => {
     const subject = "Mã OTP xác minh";
     const html = `Mã OTP lấy lại mật khẩu là: <b style="color: green;">${account.otp}</b>. Thời hạn sử dụng là:${account.otpExpires}`;
     const verifyEmail = await sendMail(email, subject, html);
-    const token = jwt.sign(
-      {
-        email: account.email,
-        id: account._id,
-      },
-      process.env.JSON_WEB_TOKEN_SECRET_KEY
-    );
+
     return res.status(200).json({
       message: "Tài khoản được tạo. Vui lòng nhập mã OTP xác minh",
       error: false,
       success: true,
-      token: token,
     });
   } catch (error) {
     return res
@@ -81,13 +67,13 @@ module.exports.verifyEmail = async (req, res) => {
         message: "Xác minh Email thành công. Vui lòng chờ Admin phê duyệt",
       });
     } else if (user.otp !== otp) {
-      return res.status(200).json({
+      return res.status(400).json({
         error: true,
         success: false,
         message: "Mã OTP không chính xác",
       });
     } else {
-      return res.status(200).json({
+      return res.status(400).json({
         error: true,
         success: false,
         message: "Mã OTP đã hết hạn",
@@ -143,14 +129,15 @@ module.exports.login = async (req, res) => {
     const accessToken = await generateAccessToken(user._id);
     const refreshToken = await generateRefreshToken(user._id);
     const updateUser = await UserAdmin.findByIdAndUpdate(user?._id, {
+      refresh_token: refreshToken,
       last_login_date: new Date(),
     });
     const cookiesOption = {
       httpOnly: true,
-      secure: false, //deloy thì bật lại
-      sameSite: "None",
+      secure: process.env.NODE_ENV === "production" ? true : false,
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     };
-    res.cookie("accessToken", accessToken, cookiesOption);
+
     res.cookie("refreshToken", refreshToken, cookiesOption);
     return res.status(200).json({
       error: false,
@@ -158,7 +145,6 @@ module.exports.login = async (req, res) => {
       message: "Đăng nhập thành công",
       data: {
         accessToken,
-        refreshToken,
       },
     });
   } catch (error) {
@@ -185,7 +171,7 @@ module.exports.userAvatar = async (req, res) => {
 
     // Xóa ảnh cũ nếu có
     if (user.avatar_public_id) {
-      await cloudinary.uploader.destroy(user.avatar_public_id);
+      cloudinary.uploader.destroy(user.avatar_public_id);
     }
 
     // Cập nhật avatar mới
@@ -194,7 +180,8 @@ module.exports.userAvatar = async (req, res) => {
     await user.save();
 
     return res.status(200).json({
-      _id: user._id,
+      error: false,
+      success: true,
       avatar: user.avatar,
     });
   } catch (error) {
@@ -208,7 +195,7 @@ module.exports.userAvatar = async (req, res) => {
 //[put] /update user
 module.exports.updateUser = async (req, res) => {
   try {
-    const userId = req.params.id;
+    const userId = res.locals.userId;
     let {
       name,
       dateOfBirth,
@@ -223,7 +210,11 @@ module.exports.updateUser = async (req, res) => {
     // Tìm user hiện tại
     const existUser = await UserAdmin.findById(userId);
     if (!existUser) {
-      return res.status(400).send("Tài khoản không được cập nhật");
+      return res.status(400).json({
+        error: true,
+        success: false,
+        message: "Tài khoản không được cập nhật!",
+      });
     }
 
     let verifyCode = "";
@@ -242,6 +233,7 @@ module.exports.updateUser = async (req, res) => {
 
     // Hash password nếu có
     let hashPassword = existUser.password;
+
     if (password) {
       const salt = await bcryptjs.genSalt(10);
       hashPassword = await bcryptjs.hash(password, salt);
@@ -263,7 +255,7 @@ module.exports.updateUser = async (req, res) => {
         otp: verifyCode !== "" ? verifyCode : null,
         otpExpires: otpExpires,
       },
-      { new: true }
+      { new: true },
     );
 
     return res.status(200).json({
@@ -312,7 +304,7 @@ module.exports.logout = async (req, res) => {
       secure: true,
       sameSite: "None",
     };
-    res.clearCookie("accessToken", cookiesOption);
+
     res.clearCookie("refreshToken", cookiesOption);
     const removeRefreshToken = await UserAdmin.findByIdAndUpdate(userId, {
       refresh_token: "",
@@ -387,7 +379,7 @@ module.exports.updateApproved = async (req, res) => {
     const update = await UserAdmin.findByIdAndUpdate(
       req.params.id,
       { approved: true },
-      { new: true }
+      { new: true },
     );
     return res.status(200).json({
       error: false,

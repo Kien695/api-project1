@@ -1,5 +1,5 @@
 const Role = require("../../model/role.model");
-console.log("🟢 Controller file loaded from:", __filename);
+
 //get
 module.exports.getRole = async (req, res) => {
   try {

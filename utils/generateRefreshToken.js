@@ -6,13 +6,7 @@ module.exports.generateRefreshToken = async (userId) => {
     process.env.SECRET_KEY_REFRESH_TOKEN,
     {
       expiresIn: "7d",
-    }
-  );
-  await User.updateOne(
-    { _id: userId },
-    {
-      refresh_token: token,
-    }
+    },
   );
   return token;
 };

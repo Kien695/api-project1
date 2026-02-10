@@ -89,7 +89,7 @@ module.exports.register = async (req, res) => {
         email: user.email,
         id: user._id,
       },
-      process.env.JSON_WEB_TOKEN_SECRET_KEY
+      process.env.JSON_WEB_TOKEN_SECRET_KEY,
     );
     return res.status(200).json({
       success: true,
@@ -188,10 +188,10 @@ module.exports.login = async (req, res) => {
     });
     const cookiesOption = {
       httpOnly: true,
-      secure: false, //deloy thì bật lại
-      sameSite: "None",
+      secure: process.env.NODE_ENV === "production" ? true : false,
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     };
-    res.cookie("accessToken", accessToken, cookiesOption);
+
     res.cookie("refreshToken", refreshToken, cookiesOption);
     return res.status(200).json({
       error: false,
@@ -220,7 +220,7 @@ module.exports.logout = async (req, res) => {
       secure: true,
       sameSite: "None",
     };
-    res.clearCookie("accessToken", cookiesOption);
+
     res.clearCookie("refreshToken", cookiesOption);
     const removeRefreshToken = await User.findByIdAndUpdate(userId, {
       refresh_token: "",
@@ -286,7 +286,7 @@ module.exports.removeImage = async (req, res) => {
   if (imageName) {
     const results = await cloudinary.uploader.destroy(
       imageName,
-      (error, result) => {}
+      (error, result) => {},
     );
     if (res) {
       return res.status(200).send(results);
@@ -339,7 +339,7 @@ module.exports.updateUser = async (req, res) => {
         otp: verifyCode !== "" ? verifyCode : null,
         otpExpires: otpExpires,
       },
-      { new: true }
+      { new: true },
     );
 
     return res.status(200).json({
@@ -379,7 +379,7 @@ module.exports.forgotPassword = async (req, res) => {
       },
       {
         new: true,
-      }
+      },
     );
     const subject = "Mã OTP xác minh";
     const html = `Mã OTP lấy lại mật khẩu là: <b style="color: green;">${verifyCode}</b>. Thời hạn sử dụng là: ${updateUser.otpExpires}`;
@@ -423,7 +423,7 @@ module.exports.verifyForgotPassword = async (req, res) => {
         error: true,
       });
     }
-    const currentTime = new Date().toISOString();
+    const currentTime = Date.now();
     if (user.otpExpires < currentTime) {
       return res.status(400).json({
         message: "OTP đã hết hạn",
@@ -493,8 +493,8 @@ module.exports.resetPassword = async (req, res) => {
 //refresh-token
 module.exports.refreshToken = async (req, res) => {
   try {
-    const refreshToken =
-      req.cookies.refreshToken || req?.headers?.authorization.split(" ")[1];
+    const refreshToken = req.cookies.refreshToken;
+
     if (!refreshToken) {
       return res.status(401).json({
         error: true,
@@ -504,7 +504,7 @@ module.exports.refreshToken = async (req, res) => {
     }
     const verifyToken = await jwt.verify(
       refreshToken,
-      process.env.SECRET_KEY_REFRESH_TOKEN
+      process.env.SECRET_KEY_REFRESH_TOKEN,
     );
     if (!verifyToken) {
       return res.status(401).json({
@@ -515,25 +515,19 @@ module.exports.refreshToken = async (req, res) => {
     }
     const userId = verifyToken?.id;
     const newAccessToken = await generateAccessToken(userId);
-    const cookiesOption = {
-      httpOnly: true,
-      secure: true,
-      sameSite: "None",
-    };
-    res.cookie("accessToken", newAccessToken, cookiesOption);
+
     return res.status(200).json({
       error: false,
       success: true,
-      message: "Token mới đã được tạo!",
+
       data: {
         accessToken: newAccessToken,
       },
     });
   } catch (error) {
-    return res.status(500).json({
-      error: true,
+    return res.status(403).json({
       success: false,
-      message: error.message || error,
+      message: "Refresh token hết hạn hoặc không hợp lệ",
     });
   }
 };
@@ -562,7 +556,7 @@ module.exports.deleteUser = async (req, res) => {
   try {
     const deleted = await User.findByIdAndDelete(req.params.id);
     if (!deleted) {
-      return res.status(200).json({
+      return res.status(404).json({
         message: "Người dùng không tồn tại",
         error: true,
 
