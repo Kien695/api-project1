@@ -37,6 +37,10 @@ const orderSchema = new mongoose.Schema(
     delivery_address: {
       type: String,
     },
+    mobile: {
+      type: String,
+      default: null,
+    },
     deleted: {
       type: Boolean,
       default: false,
@@ -48,7 +52,7 @@ const orderSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 const Order = mongoose.model("Order", orderSchema, "order");
 module.exports = Order;

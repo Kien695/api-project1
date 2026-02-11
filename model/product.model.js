@@ -48,6 +48,10 @@ const productSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    numReviews: {
+      type: Number,
+      default: 0,
+    },
     isFeatured: {
       type: Boolean,
       default: false,
@@ -73,7 +77,7 @@ const productSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 const Product = mongoose.model("Product", productSchema, "products");
 module.exports = Product;

@@ -16,12 +16,14 @@ const authRouter = require("./auth.router");
 const checkoutRouter = require("./checkout.router");
 const orderRouter = require("./order.router");
 const orderAdminRouter = require("./orderAdmin.router");
+const reviewProductRouter = require("./reviewProduct.router");
 module.exports = (app) => {
   app.use("/api/dashboard", homeRouter);
   app.use("/api/user", clientRouter);
   app.use("/api/category", categoryRouter);
   app.use("/api/product", productRouter);
   app.use("/api/productClient", productClientRouter);
+  app.use("/api/reviewProduct", reviewProductRouter);
   app.use("/api/cart", cartRouter);
   app.use("/api/myList", myListRouter);
   app.use("/api/address", addressRouter);
