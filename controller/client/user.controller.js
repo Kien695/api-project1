@@ -53,13 +53,7 @@ module.exports.register = async (req, res) => {
   try {
     let user;
     const { name, email, password } = req.body;
-    if (!name || !email || !password) {
-      return res.status(400).json({
-        message: "Vui lòng nhập đầy đủ thông tin",
-        error: true,
-        success: false,
-      });
-    }
+
     user = await User.findOne({ email: email });
     if (user) {
       return res.status(400).json({
@@ -81,7 +75,7 @@ module.exports.register = async (req, res) => {
     user.save();
     //send verification email
     const subject = "Mã OTP xác minh";
-    const html = `Mã OTP lấy lại mật khẩu là: <b style="color: green;">${user.otp}</b>. Thời hạn sử dụng là:${user.otpExpires}`;
+    const html = `Mã OTP xác minh là: <b style="color: green;">${user.otp}</b>. Thời hạn sử dụng là:${user.otpExpires}`;
     const verifyEmail = await sendMail(email, subject, html);
     //create a JWT token for vertification purpose
     const token = jwt.sign(
@@ -217,8 +211,8 @@ module.exports.logout = async (req, res) => {
 
     const cookiesOption = {
       httpOnly: true,
-      secure: true,
-      sameSite: "None",
+      secure: process.env.NODE_ENV === "production" ? true : false,
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     };
 
     res.clearCookie("refreshToken", cookiesOption);
@@ -263,8 +257,10 @@ module.exports.userAvatar = async (req, res) => {
     await user.save();
 
     return res.status(200).json({
-      _id: user._id,
-      avatar: user.avatar,
+      error: false,
+      success: true,
+      message: "Cập nhật ảnh đại diện thành công",
+      data: user.avatar,
     });
   } catch (error) {
     return res.status(500).json({
@@ -275,35 +271,20 @@ module.exports.userAvatar = async (req, res) => {
   }
 };
 
-//removeImageFromCloudinary
-module.exports.removeImage = async (req, res) => {
-  const imgUrl = req.query.img;
-  const urlArr = imgUrl.split("/");
-  //https://res.cloudinary.com/dzyi6hnfr/image/upload/v1754130369/vltgswbyxwgx4u5suvdd.png
-  // image = ["https","res.cloudinary.com","image","upload","v1754130369","vltgswbyxwgx4u5suvdd.png"];
-  const image = urlArr[urlArr.length - 1];
-  const imageName = image.split(".")[0];
-  if (imageName) {
-    const results = await cloudinary.uploader.destroy(
-      imageName,
-      (error, result) => {},
-    );
-    if (res) {
-      return res.status(200).send(results);
-    }
-  }
-};
-
 //update user detail
 module.exports.updateUser = async (req, res) => {
   try {
-    const userId = req.params.id;
-    let { name, email, mobile, password } = req.body; // dùng let để có thể gán lại
+    const userId = res.locals.userId;
+    let { name, email, password, mobile } = req.body; // dùng let để có thể gán lại
 
     // Tìm user hiện tại
     const existUser = await User.findById(userId);
     if (!existUser) {
-      return res.status(400).send("Tài khoản không được cập nhật");
+      return res.status(400).json({
+        message: "Người dùng không tồn tại",
+        error: true,
+        success: false,
+      });
     }
 
     let verifyCode = "";
@@ -409,13 +390,6 @@ module.exports.verifyForgotPassword = async (req, res) => {
         error: true,
       });
     }
-    if (!otp || !email) {
-      return res.status(400).json({
-        message: "Vui lòng nhập đầy đủ",
-        success: false,
-        error: true,
-      });
-    }
     if (otp !== user.otp) {
       return res.status(400).json({
         message: "OTP không hợp lệ",
@@ -451,13 +425,7 @@ module.exports.verifyForgotPassword = async (req, res) => {
 module.exports.resetPassword = async (req, res) => {
   try {
     const { email, newPassword, confirmPassword } = req.body;
-    if (!email || !newPassword || !confirmPassword) {
-      return res.status(400).json({
-        message: "Vui lòng nhập đầy đủ",
-        success: false,
-        error: true,
-      });
-    }
+
     const user = await User.findOne({ email: email });
     if (!user) {
       return res.status(400).json({
@@ -466,13 +434,7 @@ module.exports.resetPassword = async (req, res) => {
         error: true,
       });
     }
-    if (newPassword !== confirmPassword) {
-      return res.status(400).json({
-        message: "Mật khẩu và xác nhận mật khẩu chưa trung khớp!",
-        success: false,
-        error: true,
-      });
-    }
+
     const salt = await bcryptjs.genSalt(10);
     const hashPassword = await bcryptjs.hash(newPassword, salt);
     user.password = hashPassword;

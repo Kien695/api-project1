@@ -26,7 +26,7 @@ module.exports.addToCart = async (req, res) => {
       });
     } else {
       const index = cart.itemCart.findIndex(
-        (item) => item.productId.toString() === productId && item.size === size
+        (item) => item.productId.toString() === productId && item.size === size,
       );
       if (index > -1) {
         cart.itemCart[index].quantity += quantity;
@@ -57,15 +57,14 @@ module.exports.getCartItem = async (req, res) => {
     const cart = await Cart.findOne({
       userId: userId,
     }).populate("itemCart.productId");
-    let countCart = 0;
+
     let items = [];
     if (cart && cart.itemCart.length > 0) {
       items = cart.itemCart;
-      countCart = cart.itemCart.length;
     }
     return res.status(200).json({
       data: items,
-      countCart: countCart,
+
       success: true,
       error: false,
     });
@@ -90,7 +89,7 @@ module.exports.updateQuantityCart = async (req, res) => {
     const cart = await Cart.findOne({ userId: userId });
     if (cart) {
       const index = cart.itemCart.findIndex(
-        (item) => item.productId.toString() == productId && item?.size == size
+        (item) => item.productId.toString() == productId && item?.size == size,
       );
       if (index === -1) {
         return res.status(404).json({
@@ -124,7 +123,7 @@ module.exports.deleteCartItem = async (req, res) => {
     const cart = await Cart.findOne({ userId: userId });
     if (cart) {
       const index = cart.itemCart.findIndex(
-        (item) => item.productId.toString() === productId && item.size == size
+        (item) => item.productId.toString() === productId && item.size == size,
       );
       if (index === -1) {
         return res.status(404).json({
@@ -153,7 +152,7 @@ module.exports.deleteCartItem = async (req, res) => {
 module.exports.deleteCartAll = async (req, res) => {
   try {
     const userId = res.locals.userId;
-    console.log(userId);
+
     await Cart.deleteMany({ userId: userId }); // xóa tất cả giỏ hàng của user
 
     return res.status(200).json({

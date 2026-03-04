@@ -31,14 +31,14 @@ module.exports.getProduct = async (req, res) => {
       const categoryIds = await categoryHelper(category._id);
       find.category = { $in: categoryIds };
     }
-    const productSale = await Product.find(find)
+    const productPopular = await Product.find(find)
       .sort({ sale: -1 })
       .populate("category")
       .limit(7);
     return res.json({
       dataFeatured: productFeatured,
       dataNew: productNew,
-      dataSale: productSale,
+      dataSale: productPopular,
       success: true,
       error: false,
     });
@@ -90,6 +90,10 @@ module.exports.getAllProduct = async (req, res) => {
       sort[req.query.sortKey] = req.query.sortValue;
     } else {
       sort.price = "asc";
+    }
+    //rating
+    if (req.query.rating) {
+      find.rating = req.query.rating;
     }
     const totalProduct = await Product.countDocuments(find);
     const totalPage = Math.ceil(totalProduct / 11);

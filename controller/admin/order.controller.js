@@ -54,8 +54,8 @@ module.exports.updateStatus = async (req, res) => {
       if (action == "delivering") {
         order.productItems[index].order_status = "delivering";
       }
-      if (action == "confirm") {
-        order.productItems[index].order_status = "confirm";
+      if (action == "delivered") {
+        order.productItems[index].order_status = "delivered";
         order.payment_status = "yes";
       }
       await order.save();

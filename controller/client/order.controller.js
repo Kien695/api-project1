@@ -1,4 +1,5 @@
 const Cart = require("../../model/cartproduct.model");
+const Product = require("../../model/product.model");
 const Order = require("../../model/order.model");
 const User = require("../../model/user.model");
 //add
@@ -24,13 +25,18 @@ module.exports.order = async (req, res) => {
     if (buyMethod == "indirect") {
       // Xóa giỏ hàng trong Cart
       await Cart.deleteMany({ userId });
-
-      // Xóa các sản phẩm đã đặt khỏi giỏ hàng trong User
-      const productIdsOrdered = productItems.map((item) => item.productId);
-
-      await User.findByIdAndUpdate(userId, {
-        $pull: { shopping_Cart: { $in: productIdsOrdered } },
-      });
+      // Cập nhật số lượng đã bán cho từng sản phẩm
+      for (const item of productItems) {
+        await Product.findOneAndUpdate(
+          {
+            _id: item.productId,
+            countInStock: { $gte: item.quantity },
+          },
+          {
+            $inc: { countInStock: -item.quantity },
+          },
+        );
+      }
     }
 
     res.status(201).json({
@@ -53,10 +59,10 @@ module.exports.getOrder = async (req, res) => {
 
     const order = await Order.find({ userId: userId }).populate(
       "productItems.productId",
-      "_id name images brand price discountPercentage"
+      "_id name images brand price discountPercentage",
     );
 
-    if (!order) {
+    if (!order || order.length === 0) {
       return res.json({
         success: false,
         message: "Không có đơn hàng nào.",
@@ -70,7 +76,7 @@ module.exports.getOrder = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Server Error",
+      message: error.message,
       error: true,
     });
   }
@@ -82,7 +88,7 @@ module.exports.updateStatus = async (req, res) => {
     const productId = req.body.productId;
     const size = req.body.size || "";
     const action = req.body.action;
-
+    console.log(action);
     const orders = await Order.find({ userId: userId });
     if (!orders || orders.length === 0) {
       return res
@@ -92,7 +98,7 @@ module.exports.updateStatus = async (req, res) => {
     // lặp từng đơn
     for (let order of orders) {
       const index = order.productItems.findIndex(
-        (item) => item.productId.toString() === productId && item.size === size
+        (item) => item.productId.toString() === productId && item.size === size,
       );
 
       if (index !== -1) {

@@ -9,14 +9,13 @@ module.exports.putAddress = async (req, res) => {
     const updatedAddress = await Address.findOneAndUpdate(
       { userId: userId },
       bodyWithUser, // dữ liệu cập nhật
-      { new: true, upsert: true } // new: trả về dữ liệu mới, upsert: nếu chưa có thì tạo mới
+      { new: true, upsert: true }, // new: trả về dữ liệu mới, upsert: nếu chưa có thì tạo mới
     );
 
     res.status(200).json({
       error: false,
       success: true,
       message: "Cập nhật địa chỉ thành công!",
-      data: updatedAddress,
     });
   } catch (error) {
     res.status(500).json({

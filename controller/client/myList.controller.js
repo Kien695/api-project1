@@ -32,7 +32,10 @@ module.exports.deleteMyList = async (req, res) => {
         success: false,
       });
     }
-    const deleteItem = await MyList.findByIdAndDelete(req.params.id);
+    const deleteItem = await MyList.findOneAndDelete({
+      _id: req.params.id,
+      userId: res.locals.userId,
+    });
     return res.status(200).json({
       message: "Sản phẩm được xóa khỏi danh sách yêu thích",
       error: false,
@@ -67,15 +70,11 @@ module.exports.deleteAllMyList = async (req, res) => {
 //lấy
 module.exports.getMyList = async (req, res) => {
   try {
-    const countList = await MyList.countDocuments({
-      userId: res.locals.userId,
-    });
     const myList = await MyList.find({
       userId: res.locals.userId,
     }).populate("product");
     res.status(200).json({
       data: myList,
-      countList: countList,
       error: false,
       success: true,
     });

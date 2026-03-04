@@ -19,11 +19,19 @@ router.put(
   uploadToCloud.uploadOne,
   controller.userAvatar,
 );
-router.delete("/deleteImage", middleware.auth, controller.removeImage);
-router.put("/:id", middleware.auth, controller.updateUser);
+
+router.put("/info", middleware.auth, controller.updateUser);
 router.post("/forgot-password", controller.forgotPassword);
-router.post("/verify-password", controller.verifyForgotPassword);
-router.post("/reset-password", controller.resetPassword);
+router.post(
+  "/verify-password",
+  validate.verify,
+  controller.verifyForgotPassword,
+);
+router.post(
+  "/reset-password",
+  validate.resestPassword,
+  controller.resetPassword,
+);
 router.post("/refresh-token", controller.refreshToken);
 router.get("/user-detail", middleware.auth, controller.userDetail);
 router.delete("/deleteUser/:id", controller.deleteUser);
