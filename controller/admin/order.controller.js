@@ -1,4 +1,7 @@
 const Order = require("../../model/order.model");
+const Notification = require("../../model/notification.model");
+const UserNotification = require("../../model/userReadNotifies.mode.js");
+const { getIO } = require("../../socket");
 //get order
 module.exports.getOrder = async (req, res) => {
   try {
@@ -45,20 +48,54 @@ module.exports.updateStatus = async (req, res) => {
     const productId = req.body.productId;
     const size = req.body.size || "";
     const action = req.body.action;
+    const order = await Order.findById(orderId).populate(
+      "productItems.productId",
+      "_id name images brand size",
+    );
 
-    const order = await Order.findById(orderId);
+    let message = "";
     if (order) {
       const index = order.productItems.findIndex(
-        (item) => item.productId.toString() === productId && item.size == size,
+        (item) =>
+          item.productId._id.toString() === productId && item.size == size,
       );
+      if (index === -1) {
+        return res.status(404).json({
+          success: false,
+          message: "Không tìm thấy sản phẩm trong đơn hàng",
+        });
+      }
       if (action == "delivering") {
         order.productItems[index].order_status = "delivering";
+        message = "Đơn hàng đang được vận chuyển!";
       }
       if (action == "delivered") {
         order.productItems[index].order_status = "delivered";
         order.payment_status = "yes";
+        message = "Đơn hàng đã được giao thành công!";
       }
       await order.save();
+      const noties = await Notification.create({
+        title: "Trạng thái đơn hàng",
+        receptor: order.userId.toString(),
+        content: message,
+        product: productId,
+        type: "system",
+        targetRole: "user",
+      });
+      await UserNotification.create({
+        user: order.userId,
+        notification: noties._id,
+        isRead: false,
+      });
+      const populatedNoties = await Notification.findById(noties._id).populate(
+        "product",
+        "name images",
+      );
+
+      const io = getIO();
+      io.to(order.userId.toString()).emit("ORDER_STATUS", populatedNoties);
+
       return res.status(200).json({
         success: true,
         message: "Cập nhật trạng thái thành công!",

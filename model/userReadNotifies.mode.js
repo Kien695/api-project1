@@ -18,7 +18,7 @@ const UserNotificationSchema = new mongoose.Schema(
   },
   { timestamps: true },
 );
-const UserNotification = mongose.model(
+const UserNotification = mongoose.model(
   "UserNotification",
   UserNotificationSchema,
   "user-read-notification",

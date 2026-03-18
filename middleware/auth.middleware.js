@@ -1,10 +1,11 @@
 const jwt = require("jsonwebtoken");
 module.exports.auth = (req, res, next) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+  const accessToken = req.headers.authorization?.startsWith("Bearer ")
+    ? req.headers.authorization.split(" ")[1]
+    : req.cookies?.accessToken;
+  if (!accessToken) {
     return res.status(401).json({ message: "Thiếu access token" });
   }
-  const accessToken = authHeader.split(" ")[1];
   try {
     const decoded = jwt.verify(
       accessToken,

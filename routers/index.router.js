@@ -17,6 +17,7 @@ const checkoutRouter = require("./checkout.router");
 const orderRouter = require("./order.router");
 const orderAdminRouter = require("./orderAdmin.router");
 const reviewProductRouter = require("./reviewProduct.router");
+const notifyRouter = require("./notification.router");
 module.exports = (app) => {
   app.use("/api/dashboard", homeRouter);
   app.use("/api/user", clientRouter);
@@ -37,4 +38,5 @@ module.exports = (app) => {
   app.use("/api/checkout", checkoutRouter);
   app.use("/api/order", orderRouter);
   app.use("/api/orderAdmin", orderAdminRouter);
+  app.use("/api/notification", notifyRouter);
 };

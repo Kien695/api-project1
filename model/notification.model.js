@@ -21,18 +21,13 @@ const NotificationSchema = new mongoose.Schema(
       enum: ["all", "user", "admin"],
       default: "all",
     },
-
+    receptor: String,
     startDate: Date,
     endDate: Date,
 
     isActive: {
       type: Boolean,
       default: true,
-    },
-
-    createdBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
     },
   },
   { timestamps: true },
