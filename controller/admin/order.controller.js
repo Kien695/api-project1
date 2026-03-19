@@ -94,7 +94,7 @@ module.exports.updateStatus = async (req, res) => {
       );
 
       const io = getIO();
-      io.to(order.userId.toString()).emit("ORDER_STATUS", populatedNoties);
+      io.to(order.userId.toString()).emit("NOTI_STATUS", populatedNoties);
 
       return res.status(200).json({
         success: true,
