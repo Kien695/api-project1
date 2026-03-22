@@ -139,6 +139,7 @@ module.exports.login = async (req, res) => {
     };
 
     res.cookie("refreshToken", refreshToken, cookiesOption);
+    res.cookie("accessToken", accessToken, cookiesOption);
     return res.status(200).json({
       error: false,
       success: true,

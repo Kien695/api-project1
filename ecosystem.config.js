@@ -1,7 +1,7 @@
 module.exports = {
   apps: [
     {
-      name: "ApiChatapp",
+      name: "ApiEcomerce",
       script: "index.js",
       autorestart: true,
       watch: false,

@@ -121,19 +121,35 @@ module.exports.getAllProduct = async (req, res) => {
 //detail
 module.exports.detailProduct = async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id).populate("category");
+    const product = await Product.findById(req.params.id);
+
     if (!product) {
-      res.status(400).json({
+      return res.status(400).json({
         message: "Sản phẩm không được tìm thấy",
         error: true,
         success: false,
       });
     }
 
+    const siblingCategories = await Category.findOne({
+      _id: product.category,
+    });
+
+    const cateParent = await Category.findOne({
+      _id: siblingCategories.parentId,
+    });
+
+    const categoryIds = await categoryHelper(cateParent._id);
+
+    const relatedProducts = await Product.find({
+      category: { $in: categoryIds },
+      _id: { $ne: req.params.id },
+    }).limit(8);
     return res.status(200).json({
       error: false,
       success: true,
       data: product,
+      related: relatedProducts,
     });
   } catch (error) {
     return res.status(500).json({

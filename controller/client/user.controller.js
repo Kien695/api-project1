@@ -77,19 +77,10 @@ module.exports.register = async (req, res) => {
     const subject = "Mã OTP xác minh";
     const html = `Mã OTP xác minh là: <b style="color: green;">${user.otp}</b>. Thời hạn sử dụng là:${user.otpExpires}`;
     const verifyEmail = await sendMail(email, subject, html);
-    //create a JWT token for vertification purpose
-    const token = jwt.sign(
-      {
-        email: user.email,
-        id: user._id,
-      },
-      process.env.JSON_WEB_TOKEN_SECRET_KEY,
-    );
     return res.status(200).json({
       success: true,
       error: false,
       message: "Đăng kí thành công",
-      token: token,
     });
   } catch (error) {
     return res.status(500).json({
@@ -187,14 +178,13 @@ module.exports.login = async (req, res) => {
     };
 
     res.cookie("refreshToken", refreshToken, cookiesOption);
-    res.cookie("accessToken", accessToken);
+    res.cookie("accessToken", accessToken, cookiesOption);
     return res.status(200).json({
       error: false,
       success: true,
       message: "Đăng nhập thành công",
       data: {
         accessToken,
-        refreshToken,
       },
     });
   } catch (error) {
@@ -478,7 +468,12 @@ module.exports.refreshToken = async (req, res) => {
     }
     const userId = verifyToken?.id;
     const newAccessToken = await generateAccessToken(userId);
-
+    const cookiesOption = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production" ? true : false,
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    };
+    res.cookie("accessToken", newAccessToken, cookiesOption);
     return res.status(200).json({
       error: false,
       success: true,
