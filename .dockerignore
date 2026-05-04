@@ -1,0 +1,17 @@
+# Ignore toàn bộ thư viện local
+node_modules
+
+# Ignore file quản lý phiên bản
+.git
+.gitignore
+
+# Ignore file Docker chính nó 
+Dockerfile
+.dockerignore
+
+# Ignore các file môi trường
+.env
+*.log
+
+# Ignore rác hệ điều hành
+**/.DS_Store
