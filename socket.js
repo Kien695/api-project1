@@ -5,7 +5,7 @@ let io;
 const initSocket = (server) => {
   io = new Server(server, {
     cors: {
-      origin: ["http://localhost:5173", "http://localhost:5175"],
+      origin: [process.env.CLIENT_API_URL, process.env.ADMIN_API_URL],
       credentials: true,
     },
   });
