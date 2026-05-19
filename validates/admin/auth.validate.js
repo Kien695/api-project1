@@ -8,7 +8,7 @@ module.exports.register = (req, res, next) => {
     });
   }
   const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
-  if (!email.text(emailRegex)) {
+  if (!emailRegex.test(email)) {
     return res.status(400).json({
       message: "Email không đúng định dạng",
       error: true,

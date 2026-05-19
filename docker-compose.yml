@@ -1,7 +1,7 @@
 services:
   app:
     build: .
-    image: tankien/api_ec:v1
+    image: tankien/api_ec:v4
     platform: linux/amd64
     container_name: be-container
     ports:

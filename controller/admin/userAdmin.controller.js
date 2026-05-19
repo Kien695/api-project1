@@ -9,6 +9,7 @@ const { generateRefreshToken } = require("../../utils/generateRefreshToken");
 module.exports.register = async (req, res) => {
   try {
     let account;
+
     const { name, email, password } = req.body;
     account = await UserAdmin.findOne({ email: email, deleted: false });
     if (account) {
