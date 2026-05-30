@@ -41,12 +41,13 @@ module.exports.payMent = async (req, res) => {
       vnp_Locale: "vn",
       vnp_CurrCode: "VND",
       vnp_TxnRef: order._id.toString(),
+      // vnp_TxnRef: Date.now().toString(),
       vnp_OrderInfo: "Thanh_toan_don_hang",
       vnp_OrderType: "billpayment",
       vnp_Amount: amount * 100, // nhân 100 theo yêu cầu VNPay
       vnp_ReturnUrl: vnp_ReturnUrl,
       vnp_IpAddr: ipAddr,
-      vnp_BankCode: "VNBANK",
+      vnp_BankCode: "NCB",
       vnp_CreateDate: moment().format("YYYYMMDDHHmmss"),
     };
 

@@ -4,6 +4,7 @@ module.exports.putAddress = async (req, res) => {
   try {
     const userId = res.locals.userId;
     const bodyWithUser = { ...req.body, userId };
+    console.log(bodyWithUser);
 
     // tìm địa chỉ của user
     const updatedAddress = await Address.findOneAndUpdate(

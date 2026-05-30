@@ -57,10 +57,12 @@ module.exports.getOrder = async (req, res) => {
   try {
     const userId = res.locals.userId;
 
-    const order = await Order.find({ userId: userId }).populate(
-      "productItems.productId",
-      "_id name images brand price discountPercentage",
-    );
+    const order = await Order.find({ userId: userId })
+      .populate(
+        "productItems.productId",
+        "_id name images brand price discountPercentage",
+      )
+      .sort({ createdAt: -1 });
 
     if (!order || order.length === 0) {
       return res.json({

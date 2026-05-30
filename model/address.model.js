@@ -5,18 +5,14 @@ const addressSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
-    province: {
-      type: String,
-      default: "",
-    },
-    district: {
-      type: String,
-      default: "",
-    },
-    ward: {
-      type: String,
-      default: "",
-    },
+    province: String,
+    provinceCode: String,
+
+    district: String,
+    districtCode: String,
+
+    ward: String,
+    wardCode: String,
 
     pinCode: {
       type: String,
@@ -36,7 +32,7 @@ const addressSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 const Address = mongoose.model("Address", addressSchema, "address");
 module.exports = Address;
