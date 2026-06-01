@@ -30,7 +30,7 @@ module.exports.createReviewProduct = async (req, res) => {
       productItems: {
         $elemMatch: {
           productId: productId,
-          order_status: { $in: ["delivering", "confirm"] },
+          order_status: { $in: ["delivered"] },
         },
       },
     });
