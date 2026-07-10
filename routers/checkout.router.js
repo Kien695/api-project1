@@ -3,7 +3,7 @@ const router = express.Router();
 const controller = require("../controller/client/checkout.controller");
 const validate = require("../validates/client/checkout.validate");
 const middleware = require("../middleware/auth.middleware");
-router.post("/payment", validate.checkout, middleware.auth, controller.payMent);
+router.post("/payment", validate.checkout, controller.payMent);
 router.post(
   "/payment-momo",
   validate.checkout,

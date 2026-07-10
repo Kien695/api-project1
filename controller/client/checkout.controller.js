@@ -9,6 +9,7 @@ const qs = require("qs");
 // Thanh toán VNPay
 module.exports.payMent = async (req, res) => {
   try {
+
     const amount = parseInt(req.body.totalAmount);
     const order = await Order.create({
       userId: res.locals.userId,

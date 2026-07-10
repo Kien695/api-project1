@@ -108,7 +108,6 @@ module.exports.updateIsRead = async (req, res) => {
 //create noti
 module.exports.create = async (req, res) => {
   try {
-    console.log(req.body);
     const { title, content } = req.body;
     const noti = await Notification.create({
       title: title,
